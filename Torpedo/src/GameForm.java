@@ -4,8 +4,10 @@ import javax.lang.model.util.ElementScanner6;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.List;
 
 
 public class GameForm extends JFrame {
@@ -15,6 +17,8 @@ public class GameForm extends JFrame {
     int enemyClicks;
     boolean[][] ownMap;
     boolean[][] enemyMap;
+
+    ArrayList<String> enemyHits;
 
     boolean newAutoClick;
 
@@ -34,6 +38,9 @@ public class GameForm extends JFrame {
         //exClicks = 0;
         //enemyClicks = 0;
         //newAutoClick = false;
+
+        enemyHits = new ArrayList<String>();
+        //....
 
         this.enemyFields = enemyFields;
 
@@ -161,6 +168,19 @@ public class GameForm extends JFrame {
     }
 
 
+    public boolean neighborIsAShip(JButton[][] fields, int x, int y){
+
+        if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange) return true;
+        else if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange) return true;
+        else if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange) return true;
+        else if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange) return true;
+
+        return false;
+
+    }
+
+
+
     public void intelliPlay(JButton[][] fields){
 
         int x = 0;
@@ -189,32 +209,129 @@ public class GameForm extends JFrame {
 
             }*/
 
-            if (!talalat || (talalat && fields[y - 1][x].getBackground() != Color.cyan && fields[y + 1][x].getBackground() != Color.cyan
-                                     && fields[y][x - 1].getBackground() != Color.cyan && fields[y][x + 1].getBackground() != Color.cyan)){       //Ha volt találat, de már minden mellette
-                                                                                                                                                  // levő "szomszéd" mező ki lett lőve... (felette, alatta, balra, jobbra)
+            int szabadIrany = 0;
+            if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.BLUE) szabadIrany++;
+            if (szabadIrany == 0 && y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) szabadIrany++;
+            if (szabadIrany == 0 && x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.BLUE) szabadIrany++;
+            if (szabadIrany == 0 && x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) szabadIrany++;
+
+            boolean wasEnemyHit = false;
+
+            if (enemyHits.size() > 0 && vel.nextInt(6) == 5)
+            {
+                wasEnemyHit = true;
+
+            }
+
+
+            if (wasEnemyHit && joIrany[0] == 0){
+
+                newX = 0;
+                newY = 0;
+
+
+                do{
+
+                    int i = 0;
+                    boolean nextField = true;
+
+
+                    if (enemyHits.size() > 1) i = vel.nextInt(enemyHits.size());
+
+                    x = Integer.parseInt(String.valueOf(enemyHits.get(i).charAt(1))) + 1;
+                    y = Integer.parseInt(String.valueOf(enemyHits.get(i).charAt(0))) + 1;
+
+                    szabadIrany = 0;
+                    if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.BLUE) szabadIrany++;
+                    if (szabadIrany == 0 && y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) szabadIrany++;
+                    if (szabadIrany == 0 && x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.BLUE) szabadIrany++;
+                    if (szabadIrany == 0 && x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) szabadIrany++;
+
+                    if (fields[y - 1][x].getBackground() == Color.orange)         //Ha felette volt találat, akkor következő irány lefelé...
+                    {
+                        if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) { y++; newY = 1; }
+                        else nextField = false;  //az az eset, amikor a hajónak adott irányban már nem lehet folytatása/következő mezője!!
+                    }
+                    else if (fields[y][x + 1].getBackground() == Color.orange)    //Ha jobbra volt találat, akkor következő irány balra...
+                    {
+                        if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.BLUE) { x--; newX = -1; }
+                        else nextField = false;  //nincs folytatása a hajónak...
+                    }
+                    else if (fields[y + 1][x].getBackground() == Color.orange)    //Ha alatta volt találat, akkor következő irány felfelé...
+                    {
+                        if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.BLUE) { y--; newY = -1; }
+                        else nextField = false;  //nincs folytatása a hajónak...
+                    }
+                    else if (fields[y][x - 1].getBackground() == Color.orange)    //Ha balra volt találat, akkor következő irány jobbra...
+                    {
+                        if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) { x++; newX = 1; }
+                        else nextField = false;  //nincs folytatása a hajónak...
+                    }
+                    else if (szabadIrany != 0){
+
+                        int rand = -1;
+
+                        do{
+
+                            newX = 0;
+                            newY = 0;
+
+                            rand = vel.nextInt(4);   // 0 => Felfelé próbálkozik...
+                            // 1 => Jobbra próbálkozik...
+                            // 2 => Lefelé próbálkozik...
+                            // 3 => Balra próbálkozik...
+
+                            if (rand == 0) newY = -1;
+                            else if (rand == 1) newX = 1;
+                            else if (rand == 2) newY = 1;
+                            else if (rand == 3) newX = -1;
+
+
+                        }while (x + newX < 1 || x + newX >= 11 || y + newY < 1 || y + newY >= 11 ||
+                                fields[y + newY][x + newX].getBackground() == Color.cyan ||
+                                fields[y + newY][x + newX].getBackground() == Color.orange ||
+                                (joIrany[0] == 0 && neighborIsAShip(fields, x + newX, y + newY)));
+
+                        x += newX;
+                        y += newY;
+
+                    }
+
+
+                    if (!nextField) enemyHits.remove(i);   //kivesszük az enemyHits listából!!
+
+
+                }while (enemyHits.size() > 0 && fields[y][x].getBackground() != Color.BLUE);
+
+
+
+            }
+            else if (!talalat || (talalat && szabadIrany == 0)){       //Ha volt találat, de már minden mellette
+                                                                       // levő "szomszéd" mező ki lett lőve... (felette, alatta, balra, jobbra)
 
                 do {
 
                     x = vel.nextInt(10) + 1;
                     y = vel.nextInt(10) + 1;
 
-                } while (fields[y][x].getBackground() != Color.cyan);
+                } while (fields[y][x].getBackground() != Color.BLUE || neighborIsAShip(fields, x, y));
 
             }
             else {
 
-                newX = 0;
-                newY = 0;
 
                 int rand = -1;
 
 
                 do{
 
+                    newX = 0;
+                    newY = 0;
+
                     rand = vel.nextInt(4);   // 0 => Felfelé próbálkozik...
-                    // 1 => Jobbra próbálkozik...
-                    // 2 => Lefelé próbálkozik...
-                    // 3 => Balra próbálkozik...
+                                                   // 1 => Jobbra próbálkozik...
+                                                   // 2 => Lefelé próbálkozik...
+                                                   // 3 => Balra próbálkozik...
 
                     switch (rand){
 
@@ -226,7 +343,10 @@ public class GameForm extends JFrame {
 
                     }
 
-                }while (fields[y + newY][x + newX].getBackground() != Color.cyan || x + newX < 1 || x + newX >= 11 || y + newY < 1 || y + newY >= 11 ||
+                }while (x + newX < 1 || x + newX >= 11 || y + newY < 1 || y + newY >= 11 ||
+                        fields[y + newY][x + newX].getBackground() == Color.cyan ||
+                        fields[y + newY][x + newX].getBackground() == Color.orange ||
+                        (joIrany[0] == 0 && neighborIsAShip(fields, x + newX, y + newY)) ||
                         (talalat && joIrany[0] != 0 && !Arrays.asList(joIrany).contains(rand)));
 
                 x += newX;
@@ -236,32 +356,34 @@ public class GameForm extends JFrame {
             }
 
 
-            if (fields[y][x].getBackground() == Color.cyan) {
 
-                if (ownMap[y - 1][x - 1]) fields[y][x].setBackground(Color.BLUE);
-                else fields[y][x].setBackground(Color.orange);
+            Color exColor = fields[y][x].getBackground();
+
+            if (fields[y][x].getBackground() == Color.BLUE) {
+
+                if (enemyMap[y - 1][x - 1]) fields[y][x].setBackground(Color.orange);
+                else fields[y][x].setBackground(Color.cyan);
 
                 enemyClicks++;
                 //newAutoClick = true;
             }
 
 
-            if (talalat && ownMap[y - 1][x - 1]) {
+            if (!wasEnemyHit || (wasEnemyHit && exColor == Color.BLUE)){
 
-                if (newX != 0) { joIrany[0] = 1; joIrany[1] = 3; }  // Vízszintes iranyú "dupla találat" történt => Innentől csak balra és jobbra irányban próbálkozhat tovább!!!
-                else { joIrany[0] = 0; joIrany[1] = 2; }            // Függőleges iranyú "dupla találat" történt => Innentől csak felfele és lefele irányban próbálkozhat tovább!!!
+                if ((talalat || wasEnemyHit) && enemyMap[y - 1][x - 1]) {
 
-                switch (newY){
-
-                    case -1:   break;
-                    case 1:  break;
-                    default:  break;
+                    if (newX != 0) { joIrany[0] = 1; joIrany[1] = 3; }  // Vízszintes iranyú "dupla találat" történt => Innentől csak balra és jobbra irányban próbálkozhat tovább!!!
+                    else { joIrany[0] = 0; joIrany[1] = 2; }            // Függőleges iranyú "dupla találat" történt => Innentől csak felfele és lefele irányban próbálkozhat tovább!!!
 
                 }
+                else if ((talalat || wasEnemyHit) && !enemyMap[y - 1][x - 1] && joIrany[0] != 0) { joIrany[0] = 0; joIrany[1] = 0; }
+
+                if (!talalat && !wasEnemyHit && enemyMap[y - 1][x - 1]) enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1));
+
+                talalat = enemyMap[y - 1][x - 1];
 
             }
-
-            talalat = ownMap[y - 1][x - 1];
 
 
         }while (talalat);
@@ -336,12 +458,12 @@ public class GameForm extends JFrame {
                     area.add(fields[i][j]);
 
                     /*if (ownMap[i-1][j-1]) {
-                        fields[i][j].setBackground(Color.BLUE);
+                        fields[i][j].setBackground(Color.orange);
 
                     }
                     else fields[i][j].setBackground(Color.WHITE);*/
 
-                    fields[i][j].setBackground(Color.cyan);
+                    fields[i][j].setBackground(Color.BLUE);
                     fields[i][j].setForeground(Color.darkGray);
 
                     //fields[i][j].setBorderPainted(true);
@@ -358,9 +480,9 @@ public class GameForm extends JFrame {
 
                         Color exColor = fields[i2][j2].getBackground();
 
-                        if (fields[i2][j2].getBackground() == Color.cyan) {
-                            if (ownMap[i2 - 1][j2 - 1]) fields[i2][j2].setBackground(Color.BLUE);
-                            else fields[i2][j2].setBackground(Color.orange);
+                        if (fields[i2][j2].getBackground() == Color.BLUE) {
+                            if (ownMap[i2 - 1][j2 - 1]) fields[i2][j2].setBackground(Color.orange);
+                            else fields[i2][j2].setBackground(Color.cyan);
 
                             //intelliPlay(enemyFields);
 
@@ -368,8 +490,8 @@ public class GameForm extends JFrame {
                             //newAutoClick = true;
                         }
 
-                        if (!ownMap[i2 - 1][j2 - 1] && exColor == Color.cyan) intelliPlay(enemyFields);  // -> Kattintásonként egyszer kellene
-                        //                                                                                az ellenfélnek tippelni!!
+                        if (!ownMap[i2 - 1][j2 - 1] && exColor == Color.BLUE) intelliPlay(enemyFields);  // -> Kattintásonként egyszer kellene
+                        //                                                                                     az ellenfélnek tippelni!!
                         //intelliPlay(enemyFields);
 
 
