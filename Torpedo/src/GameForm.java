@@ -340,19 +340,6 @@ public class GameForm extends JFrame {
         do
         {
 
-
-            /*JButton[][] newFields = new JButton[11][11];
-
-            for (int i = 1; i < 11; i++) {
-
-                for (int j = 1; j < 11; j++) {
-
-                    newFields[i][j] = fields[i][j];
-
-                }
-
-            }*/
-
             int szabadIrany = 0;
             if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.BLUE) szabadIrany++;
             if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) szabadIrany++;
@@ -817,7 +804,6 @@ public class GameForm extends JFrame {
 
             }
 
-            System.out.print("Találat?! " + enemyMap[y - 1][x - 1] + " exC: " + exColor.toString());
 
             if (!wasEnemyHit || ((wasEnemyHit || enemyMap[y - 1][x - 1]) && exColor == Color.BLUE)){
 
@@ -937,16 +923,8 @@ public class GameForm extends JFrame {
                     fields[i][j] = new JButton();
                     area.add(fields[i][j]);
 
-                    /*if (ownMap[i-1][j-1]) {
-                        fields[i][j].setBackground(Color.orange);
-
-                    }
-                    else fields[i][j].setBackground(Color.WHITE);*/
-
                     fields[i][j].setBackground(Color.BLUE);
                     fields[i][j].setForeground(Color.darkGray);
-
-                    //fields[i][j].setBorderPainted(true);
 
                     fields[i][j].setBorder(BorderFactory.createLineBorder(Color.black));
 
@@ -1013,21 +991,9 @@ public class GameForm extends JFrame {
         }
 
 
-        /*if (intelliEnemy) {
-
-            while (true){
-
-                while (enemyClicks == clicks);
-                intelliPlay(fields);
-
-            }
-        }*/
-
-
-
-
     }
 
+    
     public JButton[][] getFields(){
 
         return fields;
