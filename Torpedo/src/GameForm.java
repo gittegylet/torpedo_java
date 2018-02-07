@@ -16,6 +16,10 @@ import java.util.List;
 
 public class GameForm extends JFrame {
 
+    boolean reGame;
+    int xFreeWays;    //.... segéd!
+
+
     int clicks;
     int exClicks;
     int enemyClicks;
@@ -40,6 +44,9 @@ public class GameForm extends JFrame {
 
     JButton[][] enemyFields;
 
+    private int maxFreeWays = 4;
+
+
     public static synchronized void playSound(final String path) {
         new Thread(new Runnable() {
 
@@ -59,40 +66,52 @@ public class GameForm extends JFrame {
 
     public GameForm(boolean intelliEnemy, boolean[][] gamerMap1, boolean[][] gamerMap2, JButton[][] enemyFields){
 
-        clicks = 0;
-        exClicks = 0;
-        enemyClicks = 0;
-        shipCounter = 0;
-        enemyShipCount = 0;
+        //do {
 
-        if (!intelliEnemy) for (int i = 0; i < 10; i++){
+            clicks = 0;
+            exClicks = 0;
+            enemyClicks = 0;
+            shipCounter = 0;
+            enemyShipCount = 0;
 
-            for (int j = 0; j < 10; j++){
+            if (!intelliEnemy) {
 
-                if (gamerMap2[i][j]) enemyShipCount++;
+                reGame = true;
+                for (int i = 0; i < 10; i++){
+
+                    for (int j = 0; j < 10; j++){
+
+                        if (gamerMap2[i][j]) enemyShipCount++;
+
+                    }
+
+                }
 
             }
+            else reGame = false;
 
-        }
+
+            enemyHits = new ArrayList<String>();
+
+            this.enemyFields = enemyFields;
+
+            ownMap = gamerMap1;
+            enemyMap = gamerMap2;
+
+            setMap(6, ownMap);
+            if (intelliEnemy) setMap(6, enemyMap);
+
+            initGUI(intelliEnemy, ownMap, enemyMap, this.enemyFields);
 
 
-        enemyHits = new ArrayList<String>();
-
-        this.enemyFields = enemyFields;
-
-        ownMap = gamerMap1;
-        enemyMap = gamerMap2;
-
-        setMap(6, ownMap);
-        if (intelliEnemy) setMap(6, enemyMap);
-
-        initGUI(intelliEnemy, ownMap, enemyMap, this.enemyFields);
+        //}
+        //while (reGame);
 
     }
 
-    private void popUp(String message){
-        JOptionPane.showMessageDialog(null, message);
-
+    private void popUp(String message, boolean gameOver){
+        if (!gameOver) JOptionPane.showMessageDialog(null, message);
+        else JOptionPane.showMessageDialog(null, message, "GAME OVER", 0);
     }
 
 
@@ -221,7 +240,7 @@ public class GameForm extends JFrame {
     private int fullShipSize(JButton[][] fields, int x, int y, boolean clearAllPos){
 
         int fullSize = 0;  // Ha negatív érték (-1), akkor a hajó már elérte a "maximális" méretét...
-                           // (azaz kilőttük az egész hajót!)
+        // (azaz kilőttük az egész hajót!)
         int X = x;
         int Y = y;
 
@@ -229,7 +248,7 @@ public class GameForm extends JFrame {
 
         if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1)))
             while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
-        
+
         if (X + 1 < 11 && fields[Y][X + 1].getBackground() == Color.orange) while (X + 1 < 11 && fields[Y][X + 1].getBackground() == Color.orange)
         {
             X++;
@@ -299,13 +318,13 @@ public class GameForm extends JFrame {
         if (length > 1 && length != 5) {
 
             if (X + 1 < 11 && fields[Y][X + 1].getBackground() == Color.orange &&
-                (X - 1 <= 0 || fields[Y][X - 1].getBackground() == Color.cyan)) fullSize++;
+                    (X - 1 <= 0 || fields[Y][X - 1].getBackground() == Color.cyan)) fullSize++;
             else if (X - 1 > 0 && fields[Y][X - 1].getBackground() == Color.orange &&
-                     (X + 1 >= 11 || fields[Y][X + 1].getBackground() == Color.cyan)) fullSize++;
+                    (X + 1 >= 11 || fields[Y][X + 1].getBackground() == Color.cyan)) fullSize++;
             else if (Y + 1 < 11 && fields[Y + 1][X].getBackground() == Color.orange &&
-                     (Y - 1 <= 0 || fields[Y - 1][X].getBackground() == Color.cyan)) fullSize++;
+                    (Y - 1 <= 0 || fields[Y - 1][X].getBackground() == Color.cyan)) fullSize++;
             else if (Y - 1 > 0 && fields[Y - 1][X].getBackground() == Color.orange &&
-                     (Y + 1 >= 11 || fields[Y + 1][X].getBackground() == Color.cyan)) fullSize++;
+                    (Y + 1 >= 11 || fields[Y + 1][X].getBackground() == Color.cyan)) fullSize++;
 
         }
 
@@ -340,11 +359,7 @@ public class GameForm extends JFrame {
         do
         {
 
-            int szabadIrany = 0;
-            if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.BLUE) szabadIrany++;
-            if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) szabadIrany++;
-            if (x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.BLUE) szabadIrany++;
-            if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) szabadIrany++;
+            int szabadIrany = freeWay(fields, x, y);
 
 
             if (fields[y][x].getBackground() == Color.orange || (joIrany[1] != 0 && talalat)) fullSize = fullShipSize(fields, x, y, false);
@@ -358,14 +373,14 @@ public class GameForm extends JFrame {
                 }
 
             }
-            
+
             boolean stopSor = false;
-            
+
             if (fields[y][x].getBackground() == Color.orange && joIrany[1] != 0) {
 
                 if (joIrany[0] == 1 && y >= 1 && y < 11 && x > 1 && x < 10 && fields[y][x - 1].getBackground() == Color.orange && fields[y][x + 1].getBackground() == Color.orange) stopSor = true;
                 else if (joIrany[1] == 2 && y > 1 && y < 10 && x >= 1 && x < 11 && fields[y - 1][x].getBackground() == Color.orange && fields[y + 1][x].getBackground() == Color.orange) stopSor = true;
-                
+
             }
 
 
@@ -393,17 +408,13 @@ public class GameForm extends JFrame {
                     }
 
 
-                    szabadIrany = 0;
-                    if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.BLUE) szabadIrany++;
-                    if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) szabadIrany++;
-                    if (x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.BLUE) szabadIrany++;
-                    if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) szabadIrany++;
+                    szabadIrany = freeWay(fields, x, y);
 
                     fullSize = 0;
                     if ((y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange) ||
-                        (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange) ||
-                        (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange) ||
-                        (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange))
+                            (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange) ||
+                            (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange) ||
+                            (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange))
                     {
 
                         fullSize = fullShipSize(fields, x, y, false);
@@ -435,7 +446,7 @@ public class GameForm extends JFrame {
                     }
 
                     if (fullSize > 0 && y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.orange)
-                                                                //Ha felette volt találat, akkor következő irány lefelé...
+                    //Ha felette volt találat, akkor következő irány lefelé...
                     {
 
                         if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) { y++; newY = 1; }
@@ -452,7 +463,7 @@ public class GameForm extends JFrame {
                         }
                     }
                     else if (fullSize > 0 && x + 1 <= 10 && fields[y][x + 1].getBackground() == Color.orange)
-                                //Ha jobbra volt találat, akkor következő irány balra...
+                    //Ha jobbra volt találat, akkor következő irány balra...
                     {
                         if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.BLUE) { x--; newX = -1; }
                         else {
@@ -467,7 +478,7 @@ public class GameForm extends JFrame {
                         }
                     }
                     else if (fullSize > 0 && y + 1 <= 10 && fields[y + 1][x].getBackground() == Color.orange)
-                                //Ha alatta volt találat, akkor következő irány felfelé...
+                    //Ha alatta volt találat, akkor következő irány felfelé...
                     {
                         if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.BLUE) { y--; newY = -1; }
                         else {
@@ -482,7 +493,7 @@ public class GameForm extends JFrame {
                         }
                     }
                     else if (fullSize > 0 && x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.orange)
-                                //Ha balra volt találat, akkor következő irány jobbra...
+                    //Ha balra volt találat, akkor következő irány jobbra...
                     {
                         if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) { x++; newX = 1; }
                         else {
@@ -508,9 +519,9 @@ public class GameForm extends JFrame {
                             newY = 0;
 
                             rand = vel.nextInt(4);   // 0 => Felfelé próbálkozik...
-                                                           // 1 => Jobbra próbálkozik...
-                                                           // 2 => Lefelé próbálkozik...
-                                                           // 3 => Balra próbálkozik...
+                            // 1 => Jobbra próbálkozik...
+                            // 2 => Lefelé próbálkozik...
+                            // 3 => Balra próbálkozik...
 
                             if (rand == 0) newY = -1;
                             else if (rand == 1) newX = 1;
@@ -559,9 +570,13 @@ public class GameForm extends JFrame {
                         boolean exHit;
                         boolean wasShip;
 
+                        boolean follower = false;
+
                         boolean nextExShip = false;
                         if (enemyHits.size() > 0 && vel.nextInt(3) == 0) nextExShip = true;
 
+                        int freeWays = 0;
+                        maxFreeWays = freeWayCount(fields); //freeWay(fields, x, y);
 
                         do {
 
@@ -585,11 +600,18 @@ public class GameForm extends JFrame {
 
                                 }
 
-
                             }
 
+                            follower = false;
+                            if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x))) follower = true;
+                            else if (x - 1 > 0 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 2))) follower = true;
+                            else if (y + 1 < 11 && enemyHits.contains(Integer.toString(y) + Integer.toString(x - 1))) follower = true;
+                            else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1))) follower = true;
 
-                        } while ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit))));
+
+                            if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit))))) freeWays = freeWay(fields, x, y);
+
+                        } while (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (nextExShip && (!wasShip || (wasShip && !exHit))))));
 
                         try {
                             Thread.sleep(1100);
@@ -612,9 +634,13 @@ public class GameForm extends JFrame {
                 boolean exHit;
                 boolean wasShip;
 
+                boolean follower = false;
+
                 boolean nextExShip = false;
                 if (enemyHits.size() > 0 && vel.nextInt(2) == 0) nextExShip = true;
 
+                int freeWays = 0;
+                maxFreeWays = freeWayCount(fields); //freeWay(fields, x, y);
 
                 do {
 
@@ -640,9 +666,21 @@ public class GameForm extends JFrame {
 
                     }
 
+                    follower = false;
+                    if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x))) follower = true;
+                    else if (x - 1 > 0 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 2))) follower = true;
+                    else if (y + 1 < 11 && enemyHits.contains(Integer.toString(y) + Integer.toString(x - 1))) follower = true;
+                    else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1))) follower = true;
 
-                } while ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit))));
 
+                    //if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))))
+                    //if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit)))))
+                    if ((freeWays < maxFreeWays || !(!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || !(fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))))
+                        freeWays = freeWay(fields, x, y);
+
+                //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit)))));
+                //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))));
+                } while (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit))))));
                 try {
                     Thread.sleep(1100);
                 } catch (InterruptedException e) {
@@ -663,9 +701,9 @@ public class GameForm extends JFrame {
                     newY = 0;
 
                     rand = vel.nextInt(4);   // 0 => Felfelé próbálkozik...
-                                                   // 1 => Jobbra próbálkozik...
-                                                   // 2 => Lefelé próbálkozik...
-                                                   // 3 => Balra próbálkozik...
+                    // 1 => Jobbra próbálkozik...
+                    // 2 => Lefelé próbálkozik...
+                    // 3 => Balra próbálkozik...
 
                     switch (rand){
 
@@ -727,11 +765,11 @@ public class GameForm extends JFrame {
 
                     if (enemyShipCount > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
 
-                    
+
                     if (!enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 1))) {
 
                         fullSize = fullShipSize(fields, x, y, false);
-                        
+
                         if (fullSize > 0) enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1));
                         else if (fullSize < 0) {
 
@@ -758,15 +796,15 @@ public class GameForm extends JFrame {
 
                         }
 
-                    
+
                     }
-                    
-                    
+
+
                     enemyShipCount--;
-                    if (enemyShipCount > 0) popUp("Hátralévő ellenséges találat: " + enemyShipCount + " / " + enemyHits.size());
+                    if (enemyShipCount > 0) popUp("Hátralévő ellenséges találat: " + enemyShipCount + " / " + enemyHits.size(), false);
                     else {
                         if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
-                        popUp("SAJNOS EZT A JÁTSZMÁT MOST ELVESZTETTED!!!");
+                        popUp("SAJNOS EZT A JÁTSZMÁT MOST ELVESZTETTED!!!", true);
 
                     }
 
@@ -849,8 +887,8 @@ public class GameForm extends JFrame {
 
             }
 
-
-        }while (clicks - eClicks > ownHits || talalat || fields[y][x].getBackground() == Color.orange || exColor == fields[y][x].getBackground());
+        }while (talalat || fields[y][x].getBackground() == Color.orange || exColor == fields[y][x].getBackground());
+        //}while (clicks - eClicks > ownHits || talalat || fields[y][x].getBackground() == Color.orange || exColor == fields[y][x].getBackground());
 
 
     }
@@ -864,8 +902,8 @@ public class GameForm extends JFrame {
         else enemyClicks = exClicks;
 
         setSize(600, 600);
-        if (intelliEnemy) setTitle("Torpedó Klasszik - ELLENFÉL");
-        else setTitle("Torpedó Klasszik - SAJÁT");
+        if (intelliEnemy) setTitle("Torpedó Klasszik - SAJÁT TERÜLET");
+        else setTitle("Torpedó Klasszik - ELLENSÉGES TERÜLET");
 
         setLocationRelativeTo(null);
         if (intelliEnemy) setLocation(650, 50);
@@ -952,12 +990,12 @@ public class GameForm extends JFrame {
                                 fields[i2][j2].setBackground(Color.orange);
 
                                 if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
-                                
+
                                 shipCounter--;
-                                if (shipCounter > 0) popUp("Szükséges találat: " + shipCounter + " (" + clicks + ", " + (eClicks + 1) + "/" + ownHits + ")" + " / " + enemyHits.size());
+                                if (shipCounter > 0) popUp("Szükséges találat: " + shipCounter + " (" + clicks + ", " + (eClicks + 1) + "/" + ownHits + ")" + " / " + enemyHits.size(), false);
                                 else {
                                     if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
-                                    popUp("GRATULÁLOK, EZT A JÁTSZMÁT TE NYERTED!!!");
+                                    popUp("GRATULÁLOK, EZT A JÁTSZMÁT TE NYERTED!!!", true);
 
                                 }
 
@@ -966,7 +1004,7 @@ public class GameForm extends JFrame {
 
                                 playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash1.wav");
                                 fields[i2][j2].setBackground(Color.cyan);
-                                
+
                             }
 
                             //clicks++;
@@ -976,7 +1014,7 @@ public class GameForm extends JFrame {
 
                         if (!ownMap[i2 - 1][j2 - 1] && exColor == Color.BLUE) {
                             intelliPlay(enemyFields);
-                            intelliPlay(enemyFields);
+                            //intelliPlay(enemyFields);
                             //intelliPlay(enemyFields); ...
                         }
                         else if (ownMap[i2 - 1][j2 - 1]) ownHits++;
@@ -991,19 +1029,64 @@ public class GameForm extends JFrame {
         }
 
 
+        if (!intelliEnemy && vel.nextInt(2) == 1) intelliPlay(enemyFields);  //50-50% hogy mi kezdhetünk vagy az ellenség
+
     }
 
-    
+
     public JButton[][] getFields(){
 
         return fields;
 
     }
 
-    public void setFields(JButton[][] fields){
+    private void setFields(JButton[][] fields){
 
         this.fields = fields;
 
+    }
+
+
+    private int freeWay(JButton[][] fields, int x, int y){
+
+        int szabadIrany = 0;
+
+        if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.BLUE) szabadIrany++;
+        if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) szabadIrany++;
+        if (x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.BLUE) szabadIrany++;
+        if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) szabadIrany++;
+
+        return szabadIrany;
+    }
+
+
+    private int freeWayCount(JButton[][] fields){
+
+        int szabadIrany = 0;
+        int newMaxFreeWays = 1;
+
+        for (int Y = 1; Y <= 10 && newMaxFreeWays < maxFreeWays; Y++){
+
+            for (int X = 1; X <= 10 && newMaxFreeWays < maxFreeWays; X++){
+
+                if (fields[Y][X].getBackground() == Color.BLUE) {
+
+                    szabadIrany = 0;
+                    if (Y - 1 >= 1 && fields[Y - 1][X].getBackground() == Color.BLUE) szabadIrany++;
+                    if (Y + 1 < 11 && fields[Y + 1][X].getBackground() == Color.BLUE) szabadIrany++;
+                    if (X - 1 >= 1 && fields[Y][X - 1].getBackground() == Color.BLUE) szabadIrany++;
+                    if (X + 1 < 11 && fields[Y][X + 1].getBackground() == Color.BLUE) szabadIrany++;
+
+                    if (szabadIrany > newMaxFreeWays) {
+                        newMaxFreeWays = szabadIrany;
+                        xFreeWays = Y * 10 + X;
+                    }
+
+                }
+            }
+        }
+
+        return newMaxFreeWays;
     }
 
 
