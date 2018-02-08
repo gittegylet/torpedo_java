@@ -6,9 +6,6 @@ public class Main {
         boolean[][] gamerMap1 = new boolean[10][10];
         boolean[][] gamerMap2 = new boolean[10][10];
 
-        ///int clicks = 0;
-        ///int exClicks = 0;
-
         GameForm jatek2 = new GameForm(true, gamerMap2, gamerMap1, new JButton[11][11]);
         jatek2.setVisible(true);
 
