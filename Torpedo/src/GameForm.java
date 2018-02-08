@@ -362,11 +362,17 @@ public class GameForm extends JFrame {
             int szabadIrany = freeWay(fields, x, y);
 
 
-            if (fields[y][x].getBackground() == Color.orange || (joIrany[1] != 0 && talalat)) fullSize = fullShipSize(fields, x, y, false);
+            //if (fields[y][x].getBackground() == Color.orange || (joIrany[1] != 0 && talalat)) {
 
-            if ((fields[y][x].getBackground() != Color.orange || fullSize < 0) && !wasEnemyHit) {
+            //    fullSize = fullShipSize(fields, x, y, false);
 
-                if (enemyHits.size() > 0 && vel.nextInt(2) == 1)
+            //}
+
+            //if ((fields[y][x].getBackground() != Color.orange || fullSize < 0) && !wasEnemyHit) {
+
+            if ((fields[y][x].getBackground() == Color.orange || fullSize < 0) && !wasEnemyHit) {
+
+                if (enemyHits.size() > 0 && vel.nextInt(6) <= 4)
                 {
                     wasEnemyHit = true;
 
@@ -378,14 +384,57 @@ public class GameForm extends JFrame {
 
             if (fields[y][x].getBackground() == Color.orange && joIrany[1] != 0) {
 
-                if (joIrany[0] == 1 && y >= 1 && y < 11 && x > 1 && x < 10 && fields[y][x - 1].getBackground() == Color.orange && fields[y][x + 1].getBackground() == Color.orange) stopSor = true;
-                else if (joIrany[1] == 2 && y > 1 && y < 10 && x >= 1 && x < 11 && fields[y - 1][x].getBackground() == Color.orange && fields[y + 1][x].getBackground() == Color.orange) stopSor = true;
+                if (joIrany[0] == 1 && y >= 1 && y < 11 && x > 1 && x < 10 && fields[y][x - 1].getBackground() == Color.orange && fields[y][x + 1].getBackground() == Color.orange) {
+
+                    if (x <= 5) {
+
+                        while (x < 10 && fields[y][x + 1].getBackground() == Color.orange)
+                        {
+                            x++;
+                            if (x == 10 || (fields[y][x + 1].getBackground() != Color.BLUE)) stopSor = true;
+                        }
+                    }
+                    else {
+
+                        while (x > 1 && fields[y][x - 1].getBackground() == Color.orange)
+                        {
+                            x--;
+                            if (x == 1 || (fields[y][x - 1].getBackground() != Color.BLUE)) stopSor = true;
+                        }
+
+                    }
+
+                } //stopSor = true;
+                else if (joIrany[1] == 2 && y > 1 && y < 10 && x >= 1 && x < 11 && fields[y - 1][x].getBackground() == Color.orange && fields[y + 1][x].getBackground() == Color.orange)  {
+
+                    if (y <= 5) {
+
+                        while (y < 10 && fields[y + 1][x].getBackground() == Color.orange)
+                        {
+                            y++;
+                            if (y == 10 || (fields[y + 1][x].getBackground() != Color.BLUE)) stopSor = true;
+                        }
+
+                    }
+                    else {
+
+                        while (y > 1 && fields[y - 1][x].getBackground() == Color.orange)
+                        {
+                            y--;
+                            if (y == 1 || (fields[y - 1][x].getBackground() != Color.BLUE)) stopSor = true;
+                        }
+
+                    }
+
+                } //stopSor = true;
 
             }
 
+            if (fields[y][x].getBackground() == Color.orange) fullSize = fullShipSize(fields, x, y, false);
 
 
-            if (fullSize > 0 && !stopSor && (wasEnemyHit || ((fields[y][x].getBackground() == Color.orange || fields[y][x].getBackground() == Color.orange) && szabadIrany <= 2))){
+            //if (fullSize > 0 && !stopSor && (wasEnemyHit || ((fields[y][x].getBackground() == Color.orange || talalat) && szabadIrany <= 2))){
+            if (fullSize > 0 && !stopSor && (wasEnemyHit || ((fields[y][x].getBackground() == Color.orange || talalat) && joIrany[1] != 0))){
 
                 newX = 0;
                 newY = 0;
@@ -396,14 +445,26 @@ public class GameForm extends JFrame {
 
                 do{
 
-                    if (((newX == 0 && newY == 0) || !nextField || i == -1) && wasEnemyHit && enemyHits.size() >= 1) {
+                    if (((newX == 0 && newY == 0) || !nextField || i == -1) && (wasEnemyHit || fields[y][x].getBackground() == Color.orange) && enemyHits.size() >= 1) {
 
-                        nextField = true;
+                        do{
 
-                        i = vel.nextInt(enemyHits.size());
+                            nextField = true;
 
-                        x = Integer.parseInt(String.valueOf(enemyHits.get(i).charAt(1))) + 1;
-                        y = Integer.parseInt(String.valueOf(enemyHits.get(i).charAt(0))) + 1;
+                            i = vel.nextInt(enemyHits.size());
+
+                            x = Integer.parseInt(String.valueOf(enemyHits.get(i).charAt(1))) + 1;
+                            y = Integer.parseInt(String.valueOf(enemyHits.get(i).charAt(0))) + 1;
+
+                            fullSize = fullShipSize(fields, x, y, false);
+
+                            if (fullSize < 0) {
+
+                                enemyHits.remove(i);
+
+                            }
+
+                        }while (enemyHits.size() >= 1 && fullSize < 0);
 
                     }
 
@@ -512,6 +573,62 @@ public class GameForm extends JFrame {
                         int rand = -1;
 
                         ArrayList<Integer> iranyProbak = new ArrayList<Integer>();
+
+                        if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
+                        while (szabadIrany == 0 && fields[y][x].getBackground() == Color.orange) {
+
+                            if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange)
+                                while (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange) x++;
+                            else if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange)
+                                while (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange) x--;
+                            else if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange)
+                                while (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange) y++;
+                            else if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange)
+                                while (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange) y--;
+
+                            szabadIrany = freeWay(fields, x, y);
+                            if (szabadIrany == 0)
+                            {
+                                fullShipSize(fields, x, y, true);
+                                if (enemyHits.size() > 0) {
+
+                                    do{
+
+                                        i = vel.nextInt(enemyHits.size());
+
+                                        x = Integer.parseInt(String.valueOf(enemyHits.get(i).charAt(1))) + 1;
+                                        y = Integer.parseInt(String.valueOf(enemyHits.get(i).charAt(0))) + 1;
+
+                                        fullSize = fullShipSize(fields, x, y, false);
+
+                                        if (fullSize < 0) {
+
+                                            enemyHits.remove(i);
+
+                                        }
+
+                                    }while (enemyHits.size() >= 1 && fullSize < 0);
+
+                                }
+
+                                szabadIrany = freeWay(fields, x, y);
+                                if (szabadIrany < 1 && enemyHits.size() == 0) {
+
+                                    do{
+                                        x = vel.nextInt(10) + 1;
+                                        y = vel.nextInt(10) + 1;
+
+                                        szabadIrany = 0;
+
+                                        if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
+
+                                    }while (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1)));
+
+                                }
+
+                            }
+
+                        }
 
                         do{
 
@@ -695,7 +812,43 @@ public class GameForm extends JFrame {
 
                 ArrayList<Integer> iranyProbak = new ArrayList<Integer>();
 
+
+                if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
+                while (szabadIrany == 0 && fields[y][x].getBackground() == Color.orange) {
+
+                    if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange)
+                        while (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange) y--;
+                    else if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange)
+                        while (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange) x--;
+                    else if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange)
+                        while (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange) y++;
+                    else if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange)
+                        while (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange) x++;
+
+                    szabadIrany = freeWay(fields, x, y);
+                    if (szabadIrany == 0)
+                    {
+                        fullShipSize(fields, x, y, true);
+                        if (enemyHits.size() > 0) {
+
+                            do{
+
+                                szabadIrany = 0;
+                                x = vel.nextInt(10) + 1;
+                                y = vel.nextInt(10) + 1;
+                                if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
+
+                            }while (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1)));
+
+                        }
+                    }
+
+                }
+
+
                 do{
+
+
 
                     newX = 0;
                     newY = 0;
