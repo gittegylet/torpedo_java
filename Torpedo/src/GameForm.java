@@ -236,6 +236,24 @@ public class GameForm extends JFrame {
 
     }
 
+    private boolean neighborIsNOTAFULLShip(JButton[][] fields, int x, int y){
+
+        if (y - 1 > 1 && fields[y - 1][x].getBackground() == Color.orange &&
+            enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1) + "-") &&
+            fullShipSize(fields, x, y - 1, false) <= -1) return false;
+        else if (x + 1 < 10 && fields[y][x + 1].getBackground() == Color.orange &&
+                 enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x) + "-") &&
+                fullShipSize(fields, x + 1, y, false) <= -1) return false;
+        else if (y + 1 < 10 && fields[y + 1][x].getBackground() == Color.orange &&
+                 enemyHits.contains(Integer.toString(y) + Integer.toString(x - 1) + "-") &&
+                fullShipSize(fields, x, y + 1, false) <= -1) return false;
+        else if (x - 1 > 1 && fields[y][x - 1].getBackground() == Color.orange &&
+                 enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 2) + "-") &&
+                fullShipSize(fields, x - 1, y, false) <= -1) return false;
+
+        return true;
+
+    }
 
     private int fullShipSize(JButton[][] fields, int x, int y, boolean clearAllPos){
 
@@ -247,27 +265,27 @@ public class GameForm extends JFrame {
         int length = 0;
 
         if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1)))
-            while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
+            while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.set(enemyHits.indexOf(Integer.toString(Y - 1) + Integer.toString(X - 1)), Integer.toString(Y - 1) + Integer.toString(X - 1) + "-");
 
         if (X + 1 < 11 && fields[Y][X + 1].getBackground() == Color.orange) while (X + 1 < 11 && fields[Y][X + 1].getBackground() == Color.orange)
         {
             X++;
-            if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
+            if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.set(enemyHits.indexOf(Integer.toString(Y - 1) + Integer.toString(X - 1)), Integer.toString(Y - 1) + Integer.toString(X - 1) + "-");
         }
         else if (X - 1 > 0 && fields[Y][X - 1].getBackground() == Color.orange) while (X - 1 > 0 && fields[Y][X - 1].getBackground() == Color.orange)
         {
             X--;
-            if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
+            if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.set(enemyHits.indexOf(Integer.toString(Y - 1) + Integer.toString(X - 1)), Integer.toString(Y - 1) + Integer.toString(X - 1) + "-");
         }
         else if (Y + 1 < 11 && fields[Y + 1][X].getBackground() == Color.orange) while (Y + 1 < 11 && fields[Y + 1][X].getBackground() == Color.orange)
         {
             Y++;
-            if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
+            if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.set(enemyHits.indexOf(Integer.toString(Y - 1) + Integer.toString(X - 1)), Integer.toString(Y - 1) + Integer.toString(X - 1) + "-");
         }
         else if (Y - 1 > 0 && fields[Y - 1][X].getBackground() == Color.orange) while (Y - 1 > 0 && fields[Y - 1][X].getBackground() == Color.orange)
         {
             Y--;
-            if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
+            if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.set(enemyHits.indexOf(Integer.toString(Y - 1) + Integer.toString(X - 1)), Integer.toString(Y - 1) + Integer.toString(X - 1) + "-");
         }
         else { fullSize = 1; length = 1; }
 
@@ -280,7 +298,7 @@ public class GameForm extends JFrame {
                 if (length == 1 && (X - 1 <= 0 || fields[Y][X - 1].getBackground() == Color.cyan)) fullSize++;
                 X++;
                 length++;
-                if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
+                if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.set(enemyHits.indexOf(Integer.toString(Y - 1) + Integer.toString(X - 1)), Integer.toString(Y - 1) + Integer.toString(X - 1) + "-");
 
             }
             else if (X - 1 > 0 && fields[Y][X - 1].getBackground() == Color.orange) while (X - 1 > 0 && fields[Y][X - 1].getBackground() == Color.orange)
@@ -289,7 +307,7 @@ public class GameForm extends JFrame {
                 if (length == 1 && (X + 1 >= 11 || fields[Y][X + 1].getBackground() == Color.cyan)) fullSize++;
                 X--;
                 length++;
-                if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
+                if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.set(enemyHits.indexOf(Integer.toString(Y - 1) + Integer.toString(X - 1)), Integer.toString(Y - 1) + Integer.toString(X - 1) + "-");
 
             }
             else if (Y + 1 < 11 && fields[Y + 1][X].getBackground() == Color.orange) while (Y + 1 < 11 && fields[Y + 1][X].getBackground() == Color.orange)
@@ -298,7 +316,7 @@ public class GameForm extends JFrame {
                 if (length == 1 && (Y - 1 <= 0 || fields[Y - 1][X].getBackground() == Color.cyan)) fullSize++;
                 Y++;
                 length++;
-                if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
+                if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.set(enemyHits.indexOf(Integer.toString(Y - 1) + Integer.toString(X - 1)), Integer.toString(Y - 1) + Integer.toString(X - 1) + "-");
 
             }
             else if (Y - 1 > 0 && fields[Y - 1][X].getBackground() == Color.orange) while (Y - 1 > 0 && fields[Y - 1][X].getBackground() == Color.orange)
@@ -307,7 +325,7 @@ public class GameForm extends JFrame {
                 if (length == 1 && (Y + 1 >= 11 || fields[Y + 1][X].getBackground() == Color.cyan)) fullSize++;
                 Y--;
                 length++;
-                if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.remove(Integer.toString(Y - 1) + Integer.toString(X - 1));
+                if (clearAllPos && enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) while (enemyHits.contains(Integer.toString(Y - 1) + Integer.toString(X - 1))) enemyHits.set(enemyHits.indexOf(Integer.toString(Y - 1) + Integer.toString(X - 1)), Integer.toString(Y - 1) + Integer.toString(X - 1) + "-");
 
             }
 
@@ -360,6 +378,8 @@ public class GameForm extends JFrame {
         do
         {
 
+            boolean neighborISAFULLShip = false;
+
             int szabadIrany = freeWay(fields, x, y);
 
 
@@ -371,9 +391,10 @@ public class GameForm extends JFrame {
 
             //if ((fields[y][x].getBackground() != Color.orange || fullSize < 0) && !wasEnemyHit) {
 
-            if ((fields[y][x].getBackground() == Color.orange || fullSize < 0) && !wasEnemyHit) {
+            if (((fields[y][x].getBackground() == Color.orange || fullSize < 0) && !wasEnemyHit) ||
+                (exexColor == Color.orange && (fields[y][x].getBackground() == Color.orange || talalat) && fullShipSize(fields, x, y, false) == 1)) {
 
-                if (enemyHits.size() > 0 && vel.nextInt(6) <= 4)
+                if (enemyHits.size() > 0 && vel.nextInt(7) <= 4)
                 {
                     wasEnemyHit = true;
 
@@ -435,7 +456,8 @@ public class GameForm extends JFrame {
 
 
             //if (fullSize > 0 && !stopSor && (wasEnemyHit || ((fields[y][x].getBackground() == Color.orange || talalat) && szabadIrany <= 2))){
-            if (fullSize > 0 && !stopSor && (wasEnemyHit || ((fields[y][x].getBackground() == Color.orange || talalat) && joIrany[1] != 0))){
+            if (!stopSor && (wasEnemyHit || (fullSize > 0 && (fields[y][x].getBackground() == Color.orange || talalat) && joIrany[1] != 0) ||
+                (exexColor == Color.orange && (fields[y][x].getBackground() == Color.orange || talalat) && fullShipSize(fields, x, y, false) == 1))){
 
                 newX = 0;
                 newY = 0;
@@ -446,7 +468,9 @@ public class GameForm extends JFrame {
 
                 do{
 
-                    if (((newX == 0 && newY == 0) || !nextField || i == -1) && (wasEnemyHit || fields[y][x].getBackground() == Color.orange) && enemyHits.size() >= 1) {
+                    if (((((newX == 0 && newY == 0) || !nextField || i == -1) && (wasEnemyHit || fields[y][x].getBackground() == Color.orange)) ||
+                            (exexColor == Color.orange && (fields[y][x].getBackground() == Color.orange || talalat) && fullShipSize(fields, x, y, false) == 1))
+                            && enemyHits.size() >= 1) {
 
                         do{
 
@@ -459,13 +483,13 @@ public class GameForm extends JFrame {
 
                             fullSize = fullShipSize(fields, x, y, false);
 
-                            if (fullSize < 0) {
+                            if (fullSize < 0 && enemyHits.get(i).length() < 3) {
 
-                                enemyHits.remove(i);
+                                enemyHits.set(i, Integer.toString(y - 1) + Integer.toString(x - 1) + "-");
 
                             }
 
-                        }while (enemyHits.size() >= 1 && fullSize < 0);
+                        }while (enemyHits.size() >= 1 && fullSize < 0 && enemyHits.get(i).length() < 3);
 
                     }
 
@@ -518,9 +542,9 @@ public class GameForm extends JFrame {
                             int y2 = y - 2;
 
                             while (y2 >= 1 && fields[y2][x2].getBackground() == Color.orange) y2--;
-                            if (y2 < 1 || fields[y2][x2].getBackground() != Color.BLUE && fullShipSize(fields, x, y, false) < 0) nextField = false; //az az eset,
+                            if ((y2 < 1 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) { nextField = false; fullShipSize(fields, x2, y2, true); } //az az eset,
                                 // amikor a hajónak adott irányban már nem lehet folytatása/következő mezője!!
-                            else if (fields[y2][x2].getBackground() == Color.BLUE) { enemyHits.remove(i); enemyHits.add(Integer.toString(y2) + Integer.toString(x2 - 1)); }
+                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) { enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-"); enemyHits.add(Integer.toString(y2) + Integer.toString(x2 - 1)); }
 
                         }
                     }
@@ -534,8 +558,8 @@ public class GameForm extends JFrame {
                             int y2 = y;
 
                             while (x2 <= 10 && fields[y2][x2].getBackground() == Color.orange) x2++;
-                            if (x2 > 10 || fields[y2][x2].getBackground() != Color.BLUE && fullShipSize(fields, x, y, false) < 0) nextField = false; //nincs folytatása a hajónak...
-                            else if (fields[y2][x2].getBackground() == Color.BLUE) { enemyHits.remove(i); enemyHits.add(Integer.toString(y2 - 1) + Integer.toString(x2 - 2)); }
+                            if ((x2 > 10 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) { nextField = false; fullShipSize(fields, x2, y2, true); } //nincs folytatása a hajónak...
+                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) { enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-"); enemyHits.add(Integer.toString(y2 - 1) + Integer.toString(x2 - 2)); }
 
                         }
                     }
@@ -549,8 +573,8 @@ public class GameForm extends JFrame {
                             int y2 = y + 2;
 
                             while (y2 <= 10 && fields[y2][x2].getBackground() == Color.orange) y2++;
-                            if (y2 > 10 || fields[y2][x2].getBackground() != Color.BLUE && fullShipSize(fields, x, y, false) < 0) nextField = false; //nincs folytatása a hajónak...
-                            else if (fields[y2][x2].getBackground() == Color.BLUE) { enemyHits.remove(i); enemyHits.add(Integer.toString(y2 - 2) + Integer.toString(x2 - 1)); }
+                            if ((y2 > 10 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) { nextField = false; fullShipSize(fields, x2, y2, true); } //nincs folytatása a hajónak...
+                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) { enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-"); enemyHits.add(Integer.toString(y2 - 2) + Integer.toString(x2 - 1)); }
 
                         }
                     }
@@ -564,8 +588,8 @@ public class GameForm extends JFrame {
                             int y2 = y;
 
                             while (x2 >= 1 && fields[y2][x2].getBackground() == Color.orange) x2--;
-                            if (x2 < 1 || fields[y2][x2].getBackground() != Color.BLUE && fullShipSize(fields, x, y, false) < 0) nextField = false; //nincs folytatása a hajónak...
-                            else if (fields[y2][x2].getBackground() == Color.BLUE) { enemyHits.remove(i); enemyHits.add(Integer.toString(y2 - 1) + Integer.toString(x2)); }
+                            if ((x2 < 1 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) { nextField = false; fullShipSize(fields, x2, y2, true); } //nincs folytatása a hajónak...
+                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) { enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-"); enemyHits.add(Integer.toString(y2 - 1) + Integer.toString(x2)); }
 
                         }
                     }
@@ -602,13 +626,13 @@ public class GameForm extends JFrame {
 
                                         fullSize = fullShipSize(fields, x, y, false);
 
-                                        if (fullSize < 0) {
+                                        if (fullSize < 0 && enemyHits.get(i).length() < 3) {
 
-                                            enemyHits.remove(i);
+                                            enemyHits.set(i, Integer.toString(y - 1) + Integer.toString(x - 1) + "-");
 
                                         }
 
-                                    }while (enemyHits.size() >= 1 && fullSize < 0);
+                                    }while (enemyHits.size() >= 1 && fullSize < 0 && enemyHits.get(i).length() < 3);
 
                                 }
 
@@ -623,7 +647,10 @@ public class GameForm extends JFrame {
 
                                         if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
 
-                                    }while (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1)));
+                                        if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
+                                        else if (neighborISAFULLShip) neighborISAFULLShip = false;
+
+                                    } while (neighborISAFULLShip || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
 
                                 }
 
@@ -668,7 +695,7 @@ public class GameForm extends JFrame {
                             wasEnemyHit = false;
                             //joIrany[0] = 0;
                             //joIrany[1] = 0;
-                            //if (enemyHits.size() > 0) enemyHits.remove(i);
+                            //if (enemyHits.size() > 0) enemyHits.set(i, Integer.toString(y - 1) + Integer.toString(x - 1) + "-");
                             //nextField = true;
                             fullSize = 0;
                             //talalat = true;
@@ -730,8 +757,11 @@ public class GameForm extends JFrame {
 
 
                             if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit))))) freeWays = freeWay(fields, x, y);
-                            
-                        } while (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (nextExShip && (!wasShip || (wasShip && !exHit))))));
+
+                            if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
+                            else if (neighborISAFULLShip) neighborISAFULLShip = false;
+
+                        } while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (nextExShip && (!wasShip || (wasShip && !exHit)))))));
 
                         if (fields[y][x].getBackground() == Color.BLUE) try {
                             Thread.sleep(1100);
@@ -800,7 +830,12 @@ public class GameForm extends JFrame {
 
                 //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit)))));
                 //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))));
-                } while (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit))))));
+
+                    if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
+                    else if (neighborISAFULLShip) neighborISAFULLShip = false;
+
+
+                } while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))))));
 
                 if (fields[y][x].getBackground() == Color.BLUE) try {
                     Thread.sleep(1100);
@@ -842,7 +877,10 @@ public class GameForm extends JFrame {
                                 y = vel.nextInt(10) + 1;
                                 if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
 
-                            }while (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1)));
+                                if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
+                                else if (neighborISAFULLShip) neighborISAFULLShip = false;
+
+                            } while (neighborISAFULLShip || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
 
                         }
                     }
