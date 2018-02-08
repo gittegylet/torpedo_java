@@ -353,6 +353,7 @@ public class GameForm extends JFrame {
         boolean wasEnemyHit = false;
 
         Color exColor = Color.green;
+        Color exexColor = Color.green;
 
         enemyClicks = 0;
 
@@ -655,10 +656,12 @@ public class GameForm extends JFrame {
                                 ((fields[y][x].getBackground() != Color.orange || fields[y][x].getBackground() != Color.orange) && joIrany[1] == 0 && neighborIsAShip(fields, x + newX, y + newY) && iranyProbak.size() < szabadIrany) ||
                                 (fields[y][x].getBackground() == Color.orange && joIrany[1] != 0 && !Arrays.asList(joIrany).contains(rand) && iranyProbak.size() < szabadIrany));
 
-                        if (fields[y + newY][x + newX].getBackground() == Color.BLUE) {
+                        if ((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() == Color.BLUE) {
 
                             x += newX;
                             y += newY;
+                            if (exexColor == Color.orange && !enemyMap[y - 1][x - 1]) exexColor = Color.green;
+
                         }
                         else if (iranyProbak.size() == 4 || !((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() != Color.BLUE)) {
 
@@ -727,10 +730,10 @@ public class GameForm extends JFrame {
 
 
                             if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit))))) freeWays = freeWay(fields, x, y);
-
+                            
                         } while (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (nextExShip && (!wasShip || (wasShip && !exHit))))));
 
-                        try {
+                        if (fields[y][x].getBackground() == Color.BLUE) try {
                             Thread.sleep(1100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -798,7 +801,8 @@ public class GameForm extends JFrame {
                 //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit)))));
                 //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))));
                 } while (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit))))));
-                try {
+
+                if (fields[y][x].getBackground() == Color.BLUE) try {
                     Thread.sleep(1100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -879,13 +883,13 @@ public class GameForm extends JFrame {
                         (fields[y][x].getBackground() != Color.orange && joIrany[1] == 0 && neighborIsAShip(fields, x + newX, y + newY) && iranyProbak.size() < szabadIrany) ||
                         (fields[y][x].getBackground() == Color.orange && joIrany[1] != 0 && !Arrays.asList(joIrany).contains(rand) && iranyProbak.size() < szabadIrany)));
 
-                if ((newX != 0 || newY != 0) || fields[y + newY][x + newX].getBackground() == Color.BLUE) {
+                if ((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() == Color.BLUE) {
 
                     x += newX;
                     y += newY;
+                    if (exexColor == Color.orange && !enemyMap[y - 1][x - 1]) exexColor = Color.green;
 
-
-                    try {
+                    if (fields[y][x].getBackground() == Color.BLUE) try {
                         Thread.sleep(1100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -915,6 +919,8 @@ public class GameForm extends JFrame {
                 if (enemyMap[y - 1][x - 1])
                 {
                     fields[y][x].setBackground(Color.orange);
+
+                    exexColor = Color.orange;
 
                     if (enemyShipCount > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
 
@@ -998,6 +1004,8 @@ public class GameForm extends JFrame {
 
             if (!wasEnemyHit || ((wasEnemyHit || enemyMap[y - 1][x - 1]) && exColor == Color.BLUE)){
 
+                if (enemyMap[y - 1][x - 1]) exexColor = Color.orange;
+                else if (exexColor == Color.orange) exexColor = Color.green;
 
                 if (wasEnemyHit) {
 
@@ -1040,7 +1048,13 @@ public class GameForm extends JFrame {
 
             }
 
-        }while (talalat || fields[y][x].getBackground() == Color.orange || exColor == fields[y][x].getBackground());
+
+            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && !enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 1))) { enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1)); }
+
+            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && exexColor != Color.orange) exexColor = Color.orange;
+
+
+        }while (talalat || fields[y][x].getBackground() == Color.orange || exColor == fields[y][x].getBackground() || exexColor == Color.orange);
         //}while (clicks - eClicks > ownHits || talalat || fields[y][x].getBackground() == Color.orange || exColor == fields[y][x].getBackground());
 
 
@@ -1127,15 +1141,16 @@ public class GameForm extends JFrame {
 
                         Color exColor = fields[i2][j2].getBackground();
 
-                        try {
-
-                            Thread.sleep(250);
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
 
                         if (fields[i2][j2].getBackground() == Color.BLUE) {
+
+                            try {
+
+                                Thread.sleep(250);
+
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
 
                             clicks++;
                             if (ownMap[i2 - 1][j2 - 1])
