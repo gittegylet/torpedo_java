@@ -414,8 +414,9 @@ public class GameForm extends JFrame {
 
             boolean neighborISAFULLShip = false;
 
-            if (iranyTipp == -1)
+            if (iranyTipp != -1)
             {
+                iranyTipp = -1;
                 hasANearbyShip_2 = -1;
                 hasANearbyShip_3 = -1;
             }
@@ -754,7 +755,7 @@ public class GameForm extends JFrame {
                     else {
 
                         newX = 0; newY = 0;
-                        boolean exHit;
+                        //boolean exHit;
                         boolean wasShip;
 
                         boolean follower = false;
@@ -772,7 +773,7 @@ public class GameForm extends JFrame {
 
                             wasShip = neighborIsAShip(fields, x, y);
 
-                            exHit = false;
+                            /*exHit = false;
                             if (wasShip && enemyHits.size() > 0) {
 
                                 int X = 0;
@@ -787,7 +788,7 @@ public class GameForm extends JFrame {
 
                                 }
 
-                            }
+                            }*/
 
                             follower = false;
                             if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x))) follower = true;
@@ -796,12 +797,14 @@ public class GameForm extends JFrame {
                             else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1))) follower = true;
 
 
-                            if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit))))) freeWays = freeWay(fields, x, y);
+                            if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (nextExShip))) freeWays = freeWay(fields, x, y);
 
                             if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
                             else if (neighborISAFULLShip) neighborISAFULLShip = false;
 
-                        } while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (nextExShip && (!wasShip || (wasShip && !exHit)))))));
+                        } while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) )) || (freeWays < maxFreeWays - 1 || nextExShip))));
+                        //} while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (nextExShip && (!wasShip || (wasShip && !exHit)))))));
+
 
                         if (fields[y][x].getBackground() == Color.BLUE) try {
                             Thread.sleep(1100);
@@ -821,7 +824,7 @@ public class GameForm extends JFrame {
                 // Ha volt találat, de már minden mellette
                 // levő "szomszéd" mező ki lett lőve... (felette, alatta, balra, jobbra)
 
-                boolean exHit;
+                //boolean exHit;
                 boolean wasShip;
 
                 boolean follower = false;
@@ -839,7 +842,7 @@ public class GameForm extends JFrame {
 
                     wasShip = neighborIsAShip(fields, x, y);
 
-                    exHit = false;
+                    /*exHit = false;
                     if (wasShip && enemyHits.size() > 0) {
 
                         int X = 0;
@@ -854,7 +857,7 @@ public class GameForm extends JFrame {
 
                         }
 
-                    }
+                    }*/
 
                     follower = false;
                     if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x))) follower = true;
@@ -863,19 +866,21 @@ public class GameForm extends JFrame {
                     else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1))) follower = true;
 
 
-                    //if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))))
-                    //if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit)))))
-                    if ((freeWays < maxFreeWays || !(!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || !(fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))))
+                    //if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))
+                    //if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (nextExShip)))
+                    if ((freeWays < maxFreeWays || !(!nextExShip && (fields[y][x].getBackground() != Color.BLUE) )) || (freeWays < maxFreeWays - 1 || !(fields[y][x].getBackground() != Color.BLUE && nextExShip)))
                         freeWays = freeWay(fields, x, y);
 
-                //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (nextExShip && (!wasShip || (wasShip && !exHit)))));
-                //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE || (wasShip && !exHit))) || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))));
+                //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (nextExShip)));
+                //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (fields[y][x].getBackground() != Color.BLUE && nextExShip)));
 
                     if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
                     else if (neighborISAFULLShip) neighborISAFULLShip = false;
 
+                    
+                } while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE))) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))));
+                //} while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))))));
 
-                } while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))))));
 
                 if (fields[y][x].getBackground() == Color.BLUE) try {
                     Thread.sleep(1100);
@@ -997,6 +1002,8 @@ public class GameForm extends JFrame {
                 if (enemyMap[y - 1][x - 1])
                 {
                     fields[y][x].setBackground(Color.orange);
+
+                    if (fullShipSize(fields, x, y, false) < 0) fullShipSize(fields, x, y, true);
 
                     exexColor = Color.orange;
 
@@ -1127,10 +1134,10 @@ public class GameForm extends JFrame {
             }
 
 
-            if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(3) == 1) hasANearbyShip_2 = wasANearbyShip(fields, x, y, 2);
-            else if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(5) == 1) hasANearbyShip_3 = wasANearbyShip(fields, x, y, 3);
+            if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(3) >= 1) hasANearbyShip_2 = wasANearbyShip(fields, x, y, 2);
+            else if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(5) <= 1) hasANearbyShip_3 = wasANearbyShip(fields, x, y, 3);
 
-            if (joIrany[1] == 0 && (hasANearbyShip_2 != -1 || hasANearbyShip_3 != -1))
+            if (joIrany[1] == 0 && (hasANearbyShip_2 != -1 || hasANearbyShip_3 != -1) && enemyShipCount > 0)
             {
 
                 if (hasANearbyShip_2 > -1) iranyTipp = hasANearbyShip_2;
@@ -1138,28 +1145,28 @@ public class GameForm extends JFrame {
 
 
 
-                    if (y - 1 > 0 && enemyMap[y - 2][x - 1]) {
+                    if (iranyTipp == 0 && y - 1 > 0 && fields[y - 1][x].getBackground() == Color.BLUE) {
 
                         y--;
                         talalat = true;
                         joIrany[0] = 0;
                         joIrany[1] = 2;
                     }
-                    else if (x + 1 < 11 && enemyMap[y - 1][x])  {
+                    else if (iranyTipp == 1 && x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE)  {
 
                         x++;
                         talalat = true;
                         joIrany[0] = 1;
                         joIrany[1] = 3;
                     }
-                    else if (y + 1 < 11 && enemyMap[y][x - 1]) {
+                    else if (iranyTipp == 2 && y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) {
 
                         y++;
                         talalat = true;
                         joIrany[0] = 0;
                         joIrany[1] = 2;
                     }
-                    else if (x - 1 > 0 && enemyMap[y - 1][x - 2]) {
+                    else if (iranyTipp == 3 && x - 1 > 0 && fields[y][x - 1].getBackground() == Color.BLUE) {
 
                         x--;
                         talalat = true;
@@ -1170,7 +1177,9 @@ public class GameForm extends JFrame {
 
                 if (talalat) {
 
-                    enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1));
+                    if (!enemyMap[y - 1][x - 1]) talalat = false;
+
+                    if (talalat) enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1));
 
                     if (fields[y][x].getBackground() == Color.BLUE) try {
                         Thread.sleep(1100);
@@ -1178,16 +1187,21 @@ public class GameForm extends JFrame {
                         e.printStackTrace();
                     }
 
-                    fields[y][x].setBackground(Color.orange);
+                    if (talalat && enemyShipCount > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
+                    else if (!talalat) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash1.wav");
 
-                    if (enemyShipCount > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
+                    if (talalat) fields[y][x].setBackground(Color.orange);
+                    else { fields[y][x].setBackground(Color.cyan); talalat = false; joIrany[0] = 0; joIrany[1] = 0; }
 
-                    enemyShipCount--;
+                    if (talalat && fullShipSize(fields, x, y, false) < 0) fullShipSize(fields, x, y, true);
+
+                    if (talalat) enemyShipCount--;
+
                     if (enemyShipCount <= 0) {
                         if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
                         popUp("SAJNOS EZT A JÁTSZMÁT MOST ELVESZTETTED!!!", true);
 
-                    } else popUp("Hátralévő ellenséges találat: " + enemyShipCount + " / " + enemyHits.size(), false);
+                    } else if (talalat) popUp("Hátralévő ellenséges találat: " + enemyShipCount + " / " + enemyHits.size(), false);
 
                 }
 
@@ -1195,6 +1209,61 @@ public class GameForm extends JFrame {
 
 
             if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && !enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 1))) { talalat = true; enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1)); }
+
+            if (enemyHits.size() > 0 && joIrany[1] == 0 && (exexColor == Color.orange || (enemyMap[y - 1][x - 1] && fields[y][x].getBackground() == Color.orange))) {
+
+                final int[] n = {0, -1, -1, 0, 0};   //Miért kell ahhoz tömb, hogy a lambdás esetben használható legyen???
+                enemyHits.forEach(h -> {
+
+                    if (n[1] == -1 && n[2] == -1 && !h.contains("-") && (n[0] == 0 || vel.nextInt(5) == 0)) {
+
+                        int X = Integer.parseInt(String.valueOf(h.charAt(1))) + 1;
+                        int Y = Integer.parseInt(String.valueOf(h.charAt(0))) + 1;
+
+                        if (fullShipSize(fields, X, Y, false) == 1) {
+
+                            n[1] = X;
+                            n[2] = Y;
+
+                            n[0]++;
+
+                            int diffX = 0;
+                            int diffY = 0;
+
+                            while (fields[Y + diffY][X + diffX].getBackground() != Color.BLUE) {
+
+                                diffX = 0;
+                                diffY = 0;
+
+                                switch (vel.nextInt(4)){
+
+                                    case 0: diffY--; break;
+                                    case 1: diffX++; break;
+                                    case 2: diffY++; break;
+                                    case 3: diffX--; break;
+                                    default:  break;
+
+                                }
+
+                            }
+
+                            if (diffX != 0) { joIrany[1] = 2; }
+                            else if (diffY != 0) { joIrany[0] = 1; joIrany[1] = 3; }
+
+                            if (joIrany[1] != 0) { n[3] = diffX; n[4] = diffY; }
+                        }
+                    }
+
+
+                });
+
+                if (joIrany[1] != 0 && n[1] != -1) { newX = n[3]; newY = n[4]; exexColor = Color.orange; talalat = true; x = n[1]; y = n[2]; }
+
+                if (n[0] > 0)
+                    System.out.print("1-es találat..");
+
+            }
+
 
             if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && exexColor != Color.orange) exexColor = Color.orange;
 
