@@ -1127,59 +1127,76 @@ public class GameForm extends JFrame {
             }
 
 
-            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && !enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 1))) { enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1)); }
-
-            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && exexColor != Color.orange) exexColor = Color.orange;
-
-
             if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(3) == 1) hasANearbyShip_2 = wasANearbyShip(fields, x, y, 2);
             else if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(5) == 1) hasANearbyShip_3 = wasANearbyShip(fields, x, y, 3);
 
             if (joIrany[1] == 0 && (hasANearbyShip_2 != -1 || hasANearbyShip_3 != -1))
             {
-                talalat = true;
 
                 if (hasANearbyShip_2 > -1) iranyTipp = hasANearbyShip_2;
                 else if (hasANearbyShip_3 > -1) iranyTipp = hasANearbyShip_3;
 
-                if (y - 1 > 0) {
 
-                    y--;
 
-                    joIrany[0] = 0;
-                    joIrany[1] = 2;
+                    if (y - 1 > 0 && enemyMap[y - 2][x - 1]) {
+
+                        y--;
+                        talalat = true;
+                        joIrany[0] = 0;
+                        joIrany[1] = 2;
+                    }
+                    else if (x + 1 < 11 && enemyMap[y - 1][x])  {
+
+                        x++;
+                        talalat = true;
+                        joIrany[0] = 1;
+                        joIrany[1] = 3;
+                    }
+                    else if (y + 1 < 11 && enemyMap[y][x - 1]) {
+
+                        y++;
+                        talalat = true;
+                        joIrany[0] = 0;
+                        joIrany[1] = 2;
+                    }
+                    else if (x - 1 > 0 && enemyMap[y - 1][x - 2]) {
+
+                        x--;
+                        talalat = true;
+                        joIrany[0] = 1;
+                        joIrany[1] = 3;
+                    }
+                    else talalat = false;
+
+                if (talalat) {
+
+                    enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1));
+
+                    if (fields[y][x].getBackground() == Color.BLUE) try {
+                        Thread.sleep(1100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    fields[y][x].setBackground(Color.orange);
+
+                    if (enemyShipCount > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
+
+                    enemyShipCount--;
+                    if (enemyShipCount <= 0) {
+                        if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
+                        popUp("SAJNOS EZT A JÁTSZMÁT MOST ELVESZTETTED!!!", true);
+
+                    } else popUp("Hátralévő ellenséges találat: " + enemyShipCount + " / " + enemyHits.size(), false);
+
                 }
-                else if (x + 1 < 11)  {
-
-                    x++;
-
-                    joIrany[0] = 1;
-                    joIrany[1] = 3;
-                }
-                else if (y + 1 < 11) {
-
-                    y++;
-
-                    joIrany[0] = 0;
-                    joIrany[1] = 2;
-                }
-                else if (x - 1 > 0) {
-
-                    x--;
-
-                    joIrany[0] = 1;
-                    joIrany[1] = 3;
-                }
-
-                if (fields[y][x].getBackground() == Color.BLUE) try {
-                    Thread.sleep(1100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                fields[y][x].setBackground(Color.orange);
 
             }
+
+
+            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && !enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 1))) { talalat = true; enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1)); }
+
+            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && exexColor != Color.orange) exexColor = Color.orange;
 
 
         }while (talalat || fields[y][x].getBackground() == Color.orange || exColor == fields[y][x].getBackground() || exexColor == Color.orange);
