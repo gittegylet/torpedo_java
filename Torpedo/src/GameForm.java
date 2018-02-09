@@ -1070,7 +1070,7 @@ public class GameForm extends JFrame {
 
 
                     enemyShipCount--;
-                    if (enemyShipCount > 0) popUp("Hátralévő ellenséges találat: " + enemyShipCount + " / " + enemyHits.size(), false);
+                    if (enemyShipCount > 0) popUp("Hátralévő ellenséges találat: " + enemyShipCount, false);
                     else {
                         if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
                         popUp("SAJNOS EZT A JÁTSZMÁT MOST ELVESZTETTED!!!", true);
@@ -1226,7 +1226,7 @@ public class GameForm extends JFrame {
                         if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
                         popUp("SAJNOS EZT A JÁTSZMÁT MOST ELVESZTETTED!!!", true);
 
-                    } else if (talalat) popUp("Hátralévő ellenséges találat: " + enemyShipCount + " / " + enemyHits.size(), false);
+                    } else if (talalat) popUp("Hátralévő ellenséges találat: " + enemyShipCount, false);
 
                 }
 
@@ -1409,7 +1409,7 @@ public class GameForm extends JFrame {
                                 if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
 
                                 shipCounter--;
-                                if (shipCounter > 0) popUp("Szükséges találat: " + shipCounter + " (" + clicks + ", " + (eClicks + 1) + "/" + ownHits + ")" + " / " + enemyHits.size(), false);
+                                if (shipCounter > 0) popUp("Szükséges találat: " + shipCounter, false);
                                 else {
                                     if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
                                     popUp("GRATULÁLOK, EZT A JÁTSZMÁT TE NYERTED!!!", true);
