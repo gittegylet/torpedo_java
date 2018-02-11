@@ -37,6 +37,10 @@ public class GameForm extends JFrame {
 
     List<String> enemyHits;
 
+    List<JButton> enemyFieldsList;
+
+    List<Integer> enemyShipFieldsList;
+
 
     static Random vel = new Random();
 
@@ -80,6 +84,10 @@ public class GameForm extends JFrame {
 
 
         if (!intelliEnemy) {
+
+            enemyFieldsList = new ArrayList<JButton>();
+
+            enemyShipFieldsList = new ArrayList<Integer>();
 
             reGame = true;
             for (int i = 0; i < 10; i++){
@@ -392,7 +400,7 @@ public class GameForm extends JFrame {
 
     public void intelliPlay(JButton[][] fields) {
 
-        int x = 0;
+        int x = 10;
         int y = 0;
         boolean talalat = false;
 
@@ -414,10 +422,30 @@ public class GameForm extends JFrame {
         int hasANearbyShip_2 = -1;
         int hasANearbyShip_3 = -1;
 
-        do
-        {
+        long clickedAndNoShipFields = Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
+                .filter(f -> f.getBackground() == Color.cyan)
+                //.filter(f -> f.getBackground() == Color.BLUE || f.getBackground() == Color.orange)
+                .count();
+
+
+
+        long clickedShipFields = 100;
+
+        do {
 
             boolean neighborISAFULLShip = false;
+
+            if ((x - 1 >= 0 && y - 1 >= 0 && enemyMap[y - 1][x - 1]) || clickedAndNoShipFields == Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
+                    .filter(f -> f.getBackground() == Color.cyan).count())
+                clickedShipFields = Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
+                        .filter(f -> f.getBackground() == Color.orange)
+                        .count();
+
+            clickedAndNoShipFields = Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
+                    .filter(f -> f.getBackground() == Color.cyan)
+                    //.filter(f -> f.getBackground() == Color.BLUE || f.getBackground() == Color.orange)
+                    .count();
+
 
             if (talalat || fields[y][x].getBackground() == Color.orange || exexColor == Color.orange)
                 enemyHitsX = enemyHits.stream()
@@ -429,8 +457,7 @@ public class GameForm extends JFrame {
                 neighborISAFULLShip = false;
 
 
-            if (iranyTipp != -1)
-            {
+            if (iranyTipp != -1) {
                 iranyTipp = -1;
                 hasANearbyShip_2 = -1;
                 hasANearbyShip_3 = -1;
@@ -450,8 +477,7 @@ public class GameForm extends JFrame {
             if (enemyHitsX > 0 && joIrany[1] != 0 && (((fields[y][x].getBackground() == Color.orange || fullSize < 0) && !wasEnemyHit) ||
                     (exexColor == Color.orange && (fields[y][x].getBackground() == Color.orange || talalat) && fullShipSize(fields, x, y, false) == 1))) {
 
-                if (vel.nextInt(7) <= 4)
-                {
+                if (vel.nextInt(7) <= 4) {
                     wasEnemyHit = true;
 
                 }
@@ -466,16 +492,13 @@ public class GameForm extends JFrame {
 
                     if (x <= 5) {
 
-                        while (x < 10 && fields[y][x + 1].getBackground() == Color.orange)
-                        {
+                        while (x < 10 && fields[y][x + 1].getBackground() == Color.orange) {
                             x++;
                             if (x == 10 || (fields[y][x + 1].getBackground() != Color.BLUE)) stopSor = true;
                         }
-                    }
-                    else {
+                    } else {
 
-                        while (x > 1 && fields[y][x - 1].getBackground() == Color.orange)
-                        {
+                        while (x > 1 && fields[y][x - 1].getBackground() == Color.orange) {
                             x--;
                             if (x == 1 || (fields[y][x - 1].getBackground() != Color.BLUE)) stopSor = true;
                         }
@@ -483,21 +506,18 @@ public class GameForm extends JFrame {
                     }
 
                 } //stopSor = true;
-                else if (joIrany[1] == 2 && y > 1 && y < 10 && x >= 1 && x < 11 && fields[y - 1][x].getBackground() == Color.orange && fields[y + 1][x].getBackground() == Color.orange)  {
+                else if (joIrany[1] == 2 && y > 1 && y < 10 && x >= 1 && x < 11 && fields[y - 1][x].getBackground() == Color.orange && fields[y + 1][x].getBackground() == Color.orange) {
 
                     if (y <= 5) {
 
-                        while (y < 10 && fields[y + 1][x].getBackground() == Color.orange)
-                        {
+                        while (y < 10 && fields[y + 1][x].getBackground() == Color.orange) {
                             y++;
                             if (y == 10 || (fields[y + 1][x].getBackground() != Color.BLUE)) stopSor = true;
                         }
 
-                    }
-                    else {
+                    } else {
 
-                        while (y > 1 && fields[y - 1][x].getBackground() == Color.orange)
-                        {
+                        while (y > 1 && fields[y - 1][x].getBackground() == Color.orange) {
                             y--;
                             if (y == 1 || (fields[y - 1][x].getBackground() != Color.BLUE)) stopSor = true;
                         }
@@ -510,10 +530,35 @@ public class GameForm extends JFrame {
 
             if (fields[y][x].getBackground() == Color.orange) fullSize = fullShipSize(fields, x, y, false);
 
+            //enemyShipCount
+            //shipCounter
+            if ((enemyShipFieldsList.size() > 0 && shipCounter <= 5) ||
+                (enemyShipFieldsList.size() >= 3 && enemyShipCount >= 11) ||
+                (enemyShipFieldsList.size() >= 5 && (shipCounter < 10 || enemyShipCount >= 11)) ||
+                enemyShipFieldsList.size() >= 7) {
 
+                int rand = enemyShipFieldsList.size() > 1 ? vel.nextInt(enemyShipFieldsList.size()) : 0;
+
+
+                if (enemyFieldsList.get(enemyShipFieldsList.get(rand)).getBackground() == Color.BLUE){
+
+                    x = (enemyShipFieldsList.get(rand) % 10) + 1;
+                    y = (enemyShipFieldsList.get(rand) / 10) + 1;
+
+                    enemyShipFieldsList.remove(rand);
+
+                    if (fields[y][x].getBackground() == Color.BLUE) try {
+                        Thread.sleep(1100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+
+            }else if (!stopSor && (wasEnemyHit || (fullSize > 0 && (fields[y][x].getBackground() == Color.orange || talalat) && joIrany[1] != 0) ||
+                    (exexColor == Color.orange && (fields[y][x].getBackground() == Color.orange || talalat) && fullShipSize(fields, x, y, false) == 1))) {
             //if (fullSize > 0 && !stopSor && (wasEnemyHit || ((fields[y][x].getBackground() == Color.orange || talalat) && szabadIrany <= 2))){
-            if (!stopSor && (wasEnemyHit || (fullSize > 0 && (fields[y][x].getBackground() == Color.orange || talalat) && joIrany[1] != 0) ||
-                    (exexColor == Color.orange && (fields[y][x].getBackground() == Color.orange || talalat) && fullShipSize(fields, x, y, false) == 1))){
 
                 newX = 0;
                 newY = 0;
@@ -522,13 +567,13 @@ public class GameForm extends JFrame {
                 boolean nextField = true;
 
 
-                do{
+                do {
 
                     if (((((newX == 0 && newY == 0) || !nextField || i == -1) && (wasEnemyHit || fields[y][x].getBackground() == Color.orange)) ||
                             (exexColor == Color.orange && (fields[y][x].getBackground() == Color.orange || talalat) && fullShipSize(fields, x, y, false) == 1))
                             && enemyHitsX >= 1) {
 
-                        do{
+                        do {
 
                             nextField = true;
 
@@ -545,7 +590,7 @@ public class GameForm extends JFrame {
 
                             }
 
-                        }while (enemyHitsX >= 1 && fullSize < 0 && enemyHits.get(i).length() < 3);
+                        } while (enemyHitsX >= 1 && fullSize < 0 && enemyHits.get(i).length() < 3);
 
                     }
 
@@ -556,35 +601,35 @@ public class GameForm extends JFrame {
                     if ((y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange) ||
                             (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange) ||
                             (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange) ||
-                            (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange))
-                    {
+                            (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange)) {
 
                         fullSize = fullShipSize(fields, x, y, false);
                         if (fullSize < 0) {
 
-                            if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange)
-                            {
+                            if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange) {
                                 fullSize = fullShipSize(fields, x, y - 1, false);
-                                if (fullSize < 0) {fullSize = fullShipSize(fields, x, y - 1, true);
-                                    enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();}
-                            }
-                            else if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange)
-                            {
+                                if (fullSize < 0) {
+                                    fullSize = fullShipSize(fields, x, y - 1, true);
+                                    enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();
+                                }
+                            } else if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange) {
                                 fullSize = fullShipSize(fields, x, y + 1, false);
-                                if (fullSize < 0) {fullSize = fullShipSize(fields, x, y + 1, true);
-                                    enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();}
-                            }
-                            else if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange)
-                            {
+                                if (fullSize < 0) {
+                                    fullSize = fullShipSize(fields, x, y + 1, true);
+                                    enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();
+                                }
+                            } else if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange) {
                                 fullSize = fullShipSize(fields, x - 1, y, false);
-                                if (fullSize < 0) {fullSize = fullShipSize(fields, x - 1, y, true);
-                                    enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();}
-                            }
-                            else if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange)
-                            {
+                                if (fullSize < 0) {
+                                    fullSize = fullShipSize(fields, x - 1, y, true);
+                                    enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();
+                                }
+                            } else if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange) {
                                 fullSize = fullShipSize(fields, x + 1, y, false);
-                                if (fullSize < 0) {fullSize = fullShipSize(fields, x + 1, y, true);
-                                    enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();}
+                                if (fullSize < 0) {
+                                    fullSize = fullShipSize(fields, x + 1, y, true);
+                                    enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();
+                                }
                             }
 
 
@@ -596,65 +641,97 @@ public class GameForm extends JFrame {
                     //Ha felette volt találat, akkor következő irány lefelé...
                     {
 
-                        if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) { y++; newY = 1; }
-                        else {
+                        if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) {
+                            y++;
+                            newY = 1;
+                        } else {
 
                             int x2 = x;
                             int y2 = y - 2;
 
                             while (y2 >= 1 && fields[y2][x2].getBackground() == Color.orange) y2--;
-                            if ((y2 < 1 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) { nextField = false; fullShipSize(fields, x2, y2, true); enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count(); } //az az eset,
+                            if ((y2 < 1 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) {
+                                nextField = false;
+                                fullShipSize(fields, x2, y2, true);
+                                enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();
+                            } //az az eset,
                             // amikor a hajónak adott irányban már nem lehet folytatása/következő mezője!!
-                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) { enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-"); enemyHits.add(Integer.toString(y2) + Integer.toString(x2 - 1)); }
+                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) {
+                                enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-");
+                                enemyHits.add(Integer.toString(y2) + Integer.toString(x2 - 1));
+                            }
 
                         }
-                    }
-                    else if (fullSize > 0 && x + 1 <= 10 && fields[y][x + 1].getBackground() == Color.orange)
+                    } else if (fullSize > 0 && x + 1 <= 10 && fields[y][x + 1].getBackground() == Color.orange)
                     //Ha jobbra volt találat, akkor következő irány balra...
                     {
-                        if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.BLUE) { x--; newX = -1; }
-                        else {
+                        if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.BLUE) {
+                            x--;
+                            newX = -1;
+                        } else {
 
                             int x2 = x + 2;
                             int y2 = y;
 
                             while (x2 <= 10 && fields[y2][x2].getBackground() == Color.orange) x2++;
-                            if ((x2 > 10 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) { nextField = false; fullShipSize(fields, x2, y2, true); enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count(); } //nincs folytatása a hajónak...
-                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) { enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-"); enemyHits.add(Integer.toString(y2 - 1) + Integer.toString(x2 - 2)); }
+                            if ((x2 > 10 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) {
+                                nextField = false;
+                                fullShipSize(fields, x2, y2, true);
+                                enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();
+                            } //nincs folytatása a hajónak...
+                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) {
+                                enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-");
+                                enemyHits.add(Integer.toString(y2 - 1) + Integer.toString(x2 - 2));
+                            }
 
                         }
-                    }
-                    else if (fullSize > 0 && y + 1 <= 10 && fields[y + 1][x].getBackground() == Color.orange)
+                    } else if (fullSize > 0 && y + 1 <= 10 && fields[y + 1][x].getBackground() == Color.orange)
                     //Ha alatta volt találat, akkor következő irány felfelé...
                     {
-                        if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.BLUE) { y--; newY = -1; }
-                        else {
+                        if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.BLUE) {
+                            y--;
+                            newY = -1;
+                        } else {
 
                             int x2 = x;
                             int y2 = y + 2;
 
                             while (y2 <= 10 && fields[y2][x2].getBackground() == Color.orange) y2++;
-                            if ((y2 > 10 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) { nextField = false; fullShipSize(fields, x2, y2, true); enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count(); } //nincs folytatása a hajónak...
-                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) { enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-"); enemyHits.add(Integer.toString(y2 - 2) + Integer.toString(x2 - 1)); }
+                            if ((y2 > 10 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) {
+                                nextField = false;
+                                fullShipSize(fields, x2, y2, true);
+                                enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();
+                            } //nincs folytatása a hajónak...
+                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) {
+                                enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-");
+                                enemyHits.add(Integer.toString(y2 - 2) + Integer.toString(x2 - 1));
+                            }
 
                         }
-                    }
-                    else if (fullSize > 0 && x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.orange)
+                    } else if (fullSize > 0 && x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.orange)
                     //Ha balra volt találat, akkor következő irány jobbra...
                     {
-                        if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) { x++; newX = 1; }
-                        else {
+                        if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) {
+                            x++;
+                            newX = 1;
+                        } else {
 
                             int x2 = x - 2;
                             int y2 = y;
 
                             while (x2 >= 1 && fields[y2][x2].getBackground() == Color.orange) x2--;
-                            if ((x2 < 1 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) { nextField = false; fullShipSize(fields, x2, y2, true); enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count(); } //nincs folytatása a hajónak...
-                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) { enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-"); enemyHits.add(Integer.toString(y2 - 1) + Integer.toString(x2)); }
+                            if ((x2 < 1 || fields[y2][x2].getBackground() != Color.BLUE) && fullShipSize(fields, x2, y2, false) < 0) {
+                                nextField = false;
+                                fullShipSize(fields, x2, y2, true);
+                                enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();
+                            } //nincs folytatása a hajónak...
+                            else if (fields[y2][x2].getBackground() == Color.BLUE && !enemyHits.contains(Integer.toString(y2 - 1) + Integer.toString(x2))) {
+                                enemyHits.set(i, Integer.toString(y2 - 1) + Integer.toString(x2 - 1) + "-");
+                                enemyHits.add(Integer.toString(y2 - 1) + Integer.toString(x2));
+                            }
 
                         }
-                    }
-                    else if (szabadIrany != 0 && fullSize >= 0){
+                    } else if (szabadIrany != 0 && fullSize >= 0) {
 
                         int rand = -1;
 
@@ -673,14 +750,13 @@ public class GameForm extends JFrame {
                                 while (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange) y--;
 
                             szabadIrany = freeWay(fields, x, y);
-                            if (szabadIrany == 0 && fullShipSize(fields, x, y, false) < 0)
-                            {
+                            if (szabadIrany == 0 && fullShipSize(fields, x, y, false) < 0) {
                                 fullShipSize(fields, x, y, true);
                                 enemyHitsX = enemyHits.stream().filter(h -> !h.contains("-")).count();
 
                                 if (enemyHitsX > 0) {
 
-                                    do{
+                                    do {
 
                                         i = vel.nextInt(enemyHits.size());
 
@@ -695,25 +771,28 @@ public class GameForm extends JFrame {
 
                                         }
 
-                                    }while (enemyHitsX >= 1 && fullSize < 0 && enemyHits.get(i).length() < 3);
+                                    } while (enemyHitsX >= 1 && fullSize < 0 && enemyHits.get(i).length() < 3);
 
                                 }
 
                                 szabadIrany = freeWay(fields, x, y);
                                 if (szabadIrany < 1 && enemyHits.size() == 0) {
 
-                                    do{
+                                    do {
                                         x = vel.nextInt(10) + 1;
                                         y = vel.nextInt(10) + 1;
 
                                         szabadIrany = 0;
 
-                                        if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
+                                        if (fields[y][x].getBackground() == Color.orange)
+                                            szabadIrany = freeWay(fields, x, y);
 
-                                        if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
+                                        if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y))
+                                            neighborISAFULLShip = true;
                                         else if (neighborISAFULLShip) neighborISAFULLShip = false;
 
-                                    } while (neighborISAFULLShip || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
+                                    }
+                                    while (neighborISAFULLShip || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
 
                                 }
 
@@ -721,7 +800,7 @@ public class GameForm extends JFrame {
 
                         }
 
-                        do{
+                        do {
 
                             newX = 0;
                             newY = 0;
@@ -740,7 +819,7 @@ public class GameForm extends JFrame {
                             if (!iranyProbak.contains(irany)) iranyProbak.add(irany);
 
 
-                        }while (x + newX < 1 || x + newX >= 11 || y + newY < 1 || y + newY >= 11 ||
+                        } while (x + newX < 1 || x + newX >= 11 || y + newY < 1 || y + newY >= 11 ||
                                 fields[y + newY][x + newX].getBackground() == Color.cyan ||
                                 fields[y + newY][x + newX].getBackground() == Color.orange ||
                                 ((fields[y][x].getBackground() != Color.orange || fields[y][x].getBackground() != Color.orange) && joIrany[1] == 0 && neighborIsAShip(fields, x + newX, y + newY) && iranyProbak.size() < szabadIrany) ||
@@ -752,8 +831,7 @@ public class GameForm extends JFrame {
                             y += newY;
                             if (exexColor == Color.orange && !enemyMap[y - 1][x - 1]) exexColor = Color.green;
 
-                        }
-                        else if (iranyProbak.size() == 4 || !((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() != Color.BLUE)) {
+                        } else if (iranyProbak.size() == 4 || !((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() != Color.BLUE)) {
 
                             wasEnemyHit = false;
                             //joIrany[0] = 0;
@@ -766,17 +844,19 @@ public class GameForm extends JFrame {
 
                     }
 
-                    if ((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() == Color.orange) fullSize = fullShipSize(fields, x, y, false);
+                    if ((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() == Color.orange)
+                        fullSize = fullShipSize(fields, x, y, false);
 
 
-                }while (fullSize > 0 && enemyHitsX > 0 && fields[y][x].getBackground() != Color.BLUE);
+                } while (fullSize > 0 && enemyHitsX > 0 && fields[y][x].getBackground() != Color.BLUE);
 
 
                 try {
                     if (fields[y][x].getBackground() == Color.BLUE) Thread.sleep(1100);
                     else {
 
-                        newX = 0; newY = 0;
+                        newX = 0;
+                        newY = 0;
                         //boolean exHit;
                         boolean wasShip;
 
@@ -815,18 +895,25 @@ public class GameForm extends JFrame {
                             }*/
 
                             follower = false;
-                            if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x))) follower = true;
-                            else if (x - 1 > 0 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 2))) follower = true;
-                            else if (y + 1 < 11 && enemyHits.contains(Integer.toString(y) + Integer.toString(x - 1))) follower = true;
-                            else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1))) follower = true;
+                            if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x)))
+                                follower = true;
+                            else if (x - 1 > 0 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 2)))
+                                follower = true;
+                            else if (y + 1 < 11 && enemyHits.contains(Integer.toString(y) + Integer.toString(x - 1)))
+                                follower = true;
+                            else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1)))
+                                follower = true;
 
 
-                            if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (nextExShip))) freeWays = freeWay(fields, x, y);
+                            if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE)) || (nextExShip)))
+                                freeWays = freeWay(fields, x, y);
 
-                            if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
+                            if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y))
+                                neighborISAFULLShip = true;
                             else if (neighborISAFULLShip) neighborISAFULLShip = false;
 
-                        } while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))));
+                        }
+                        while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))));
                         ////} while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 && nextExShip))));
                         //} while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (nextExShip && (!wasShip || (wasShip && !exHit)))))));
 
@@ -844,8 +931,7 @@ public class GameForm extends JFrame {
                 }
 
 
-            }
-            else if (!talalat || (fields[y][x].getBackground() != Color.orange && !wasEnemyHit && enemyHitsX > 0 && vel.nextInt(2) == 0) || ((talalat || fields[y][x].getBackground() == Color.orange) && szabadIrany == 0)){
+            } else if (!talalat || (fields[y][x].getBackground() != Color.orange && !wasEnemyHit && enemyHitsX > 0 && vel.nextInt(2) == 0) || ((talalat || fields[y][x].getBackground() == Color.orange) && szabadIrany == 0)) {
                 // Ha volt találat, de már minden mellette
                 // levő "szomszéd" mező ki lett lőve... (felette, alatta, balra, jobbra)
 
@@ -885,25 +971,31 @@ public class GameForm extends JFrame {
                     }*/
 
                     follower = false;
-                    if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x))) follower = true;
-                    else if (x - 1 > 0 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 2))) follower = true;
-                    else if (y + 1 < 11 && enemyHits.contains(Integer.toString(y) + Integer.toString(x - 1))) follower = true;
-                    else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1))) follower = true;
+                    if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x)))
+                        follower = true;
+                    else if (x - 1 > 0 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 2)))
+                        follower = true;
+                    else if (y + 1 < 11 && enemyHits.contains(Integer.toString(y) + Integer.toString(x - 1)))
+                        follower = true;
+                    else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1)))
+                        follower = true;
 
 
                     //if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))
                     //if (freeWays < maxFreeWays || !((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (nextExShip)))
-                    if ((freeWays < maxFreeWays || !(!nextExShip && (fields[y][x].getBackground() != Color.BLUE) )) || (freeWays < maxFreeWays - 1 || !(fields[y][x].getBackground() != Color.BLUE && nextExShip)))
+                    if ((freeWays < maxFreeWays || !(!nextExShip && (fields[y][x].getBackground() != Color.BLUE))) || (freeWays < maxFreeWays - 1 || !(fields[y][x].getBackground() != Color.BLUE && nextExShip)))
                         freeWays = freeWay(fields, x, y);
 
                     //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (nextExShip)));
                     //} while (freeWays < maxFreeWays || ((!nextExShip && (fields[y][x].getBackground() != Color.BLUE )) || (fields[y][x].getBackground() != Color.BLUE && nextExShip)));
 
-                    if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
+                    if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y))
+                        neighborISAFULLShip = true;
                     else if (neighborISAFULLShip) neighborISAFULLShip = false;
 
 
-                } while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))));
+                }
+                while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))));
                 //} while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))))));
 
 
@@ -913,8 +1005,7 @@ public class GameForm extends JFrame {
                     e.printStackTrace();
                 }
 
-            }
-            else if (!stopSor || fields[y][x].getBackground() == Color.orange) {
+            } else if (!stopSor || fields[y][x].getBackground() == Color.orange) {
 
 
                 int rand = -1;
@@ -935,22 +1026,23 @@ public class GameForm extends JFrame {
                         while (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange) x++;
 
                     szabadIrany = freeWay(fields, x, y);
-                    if (szabadIrany == 0)
-                    {
+                    if (szabadIrany == 0) {
                         fullShipSize(fields, x, y, true);
                         if (enemyHitsX > 0) {
 
-                            do{
+                            do {
 
                                 szabadIrany = 0;
                                 x = vel.nextInt(10) + 1;
                                 y = vel.nextInt(10) + 1;
                                 if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
 
-                                if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y)) neighborISAFULLShip = true;
+                                if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y))
+                                    neighborISAFULLShip = true;
                                 else if (neighborISAFULLShip) neighborISAFULLShip = false;
 
-                            } while (neighborISAFULLShip || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
+                            }
+                            while (neighborISAFULLShip || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
 
                         }
                     }
@@ -958,8 +1050,7 @@ public class GameForm extends JFrame {
                 }
 
 
-                do{
-
+                do {
 
 
                     newX = 0;
@@ -970,20 +1061,29 @@ public class GameForm extends JFrame {
                     // 2 => Lefelé próbálkozik...
                     // 3 => Balra próbálkozik...
 
-                    switch (rand){
+                    switch (rand) {
 
-                        case 0: newY -= 1;  break;
-                        case 1: newX += 1;  break;
-                        case 2: newY += 1;  break;
-                        case 3: newX -= 1;  break;
-                        default:  break;
+                        case 0:
+                            newY -= 1;
+                            break;
+                        case 1:
+                            newX += 1;
+                            break;
+                        case 2:
+                            newY += 1;
+                            break;
+                        case 3:
+                            newX -= 1;
+                            break;
+                        default:
+                            break;
 
                     }
 
                     Integer irany = 10 * newY + newX;
                     if (!iranyProbak.contains(irany)) iranyProbak.add(irany);
 
-                }while ((x + newX < 1 || x + newX >= 11 || y + newY < 1 || y + newY >= 11 ||
+                } while ((x + newX < 1 || x + newX >= 11 || y + newY < 1 || y + newY >= 11 ||
                         fields[y + newY][x + newX].getBackground() == Color.cyan ||
                         fields[y + newY][x + newX].getBackground() == Color.orange ||
                         //(fields[y][x].getBackground() != Color.orange && joIrany[1] == 0 && neighborIsAShip(fields, x + newX, y + newY)) ||
@@ -1012,12 +1112,11 @@ public class GameForm extends JFrame {
                     fullSize = 0;
                     talalat = false;
 
-                } if (iranyProbak.size() == 4 || fields[y][x].getBackground() == Color.orange) talalat = true;
-
+                }
+                if (iranyProbak.size() == 4 || fields[y][x].getBackground() == Color.orange) talalat = true;
 
 
             }
-
 
 
             //exColor = fields[y][x].getBackground();
@@ -1026,16 +1125,19 @@ public class GameForm extends JFrame {
 
                 exColor = fields[y][x].getBackground();
 
-                if (enemyMap[y - 1][x - 1])
-                {
+                if (enemyMap[y - 1][x - 1]){
 
                     fields[y][x].setBackground(Color.orange);
+
+                    //enemyShipFieldsList = searchClickedShips(enemyFieldsList);
+
 
                     if (fullShipSize(fields, x, y, false) < 0) fullShipSize(fields, x, y, true);
 
                     exexColor = Color.orange;
 
-                    if (enemyShipCount > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
+                    if (enemyShipCount > 1)
+                        playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
 
 
                     if (!enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 1))) {
@@ -1045,23 +1147,16 @@ public class GameForm extends JFrame {
                         if (fullSize > 0) enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1));
                         else if (fullSize < 0) {
 
-                            if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange)
-                            {
+                            if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange) {
                                 fullSize = fullShipSize(fields, x, y - 1, false);
                                 if (fullSize < 0) fullSize = fullShipSize(fields, x, y - 1, true);
-                            }
-                            else if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange)
-                            {
+                            } else if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange) {
                                 fullSize = fullShipSize(fields, x, y + 1, false);
                                 if (fullSize < 0) fullSize = fullShipSize(fields, x, y + 1, true);
-                            }
-                            else if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange)
-                            {
+                            } else if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange) {
                                 fullSize = fullShipSize(fields, x - 1, y, false);
                                 if (fullSize < 0) fullSize = fullShipSize(fields, x - 1, y, true);
-                            }
-                            else if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange)
-                            {
+                            } else if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange) {
                                 fullSize = fullShipSize(fields, x + 1, y, false);
                                 if (fullSize < 0) fullSize = fullShipSize(fields, x + 1, y, true);
                             }
@@ -1075,39 +1170,35 @@ public class GameForm extends JFrame {
                     enemyShipCount--;
                     if (enemyShipCount > 0) popUp("Hátralévő ellenséges találat: " + enemyShipCount, false);
                     else {
-                        if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
+                        if (shipCounter > 1)
+                            playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
                         popUp("SAJNOS EZT A JÁTSZMÁT MOST ELVESZTETTED!!!", true);
 
                     }
 
-                }
-                else {
+                }else {
 
                     playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash1.wav");
                     fields[y][x].setBackground(Color.cyan);
 
-                    if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange)
-                    {
+                    if (y - 1 > 0 && fields[y - 1][x].getBackground() == Color.orange) {
                         fullSize = fullShipSize(fields, x, y - 1, false);
                         if (fullSize < 0) fullSize = fullShipSize(fields, x, y - 1, true);
-                    }
-                    else if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange)
-                    {
+                    } else if (y + 1 < 11 && fields[y + 1][x].getBackground() == Color.orange) {
                         fullSize = fullShipSize(fields, x, y + 1, false);
                         if (fullSize < 0) fullSize = fullShipSize(fields, x, y + 1, true);
-                    }
-                    else if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange)
-                    {
+                    } else if (x - 1 > 0 && fields[y][x - 1].getBackground() == Color.orange) {
                         fullSize = fullShipSize(fields, x - 1, y, false);
                         if (fullSize < 0) fullSize = fullShipSize(fields, x - 1, y, true);
-                    }
-                    else if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange)
-                    {
+                    } else if (x + 1 < 11 && fields[y][x + 1].getBackground() == Color.orange) {
                         fullSize = fullShipSize(fields, x + 1, y, false);
                         if (fullSize < 0) fullSize = fullShipSize(fields, x + 1, y, true);
                     }
 
                 }
+
+                enemyShipFieldsList = searchClickedShips(enemyFieldsList);
+
 
                 eClicks++;
                 enemyClicks++;
@@ -1115,7 +1206,7 @@ public class GameForm extends JFrame {
             }
 
 
-            if (!wasEnemyHit || ((wasEnemyHit || enemyMap[y - 1][x - 1]) && exColor == Color.BLUE)){
+            if (!wasEnemyHit || ((wasEnemyHit || enemyMap[y - 1][x - 1]) && exColor == Color.BLUE)) {
 
                 if (enemyMap[y - 1][x - 1]) exexColor = Color.orange;
                 else if (exexColor == Color.orange) exexColor = Color.green;
@@ -1123,20 +1214,39 @@ public class GameForm extends JFrame {
                 if (wasEnemyHit) {
 
 
-                    if (newY != 0) { joIrany[0] = 0; joIrany[1] = 2; }       // Függőleges irányú "dupla találat" történt => Innentől csak felfele és lefele irányban próbálkozhat tovább!!!
-                    else if (newX != 0) { joIrany[0] = 1; joIrany[1] = 3; }  // Vízszintes irányú "dupla találat" történt => Innentől csak balra és jobbra irányban próbálkozhat tovább!!!
+                    if (newY != 0) {
+                        joIrany[0] = 0;
+                        joIrany[1] = 2;
+                    }       // Függőleges irányú "dupla találat" történt => Innentől csak felfele és lefele irányban próbálkozhat tovább!!!
+                    else if (newX != 0) {
+                        joIrany[0] = 1;
+                        joIrany[1] = 3;
+                    }  // Vízszintes irányú "dupla találat" történt => Innentől csak balra és jobbra irányban próbálkozhat tovább!!!
                     else if (enemyMap[y - 1][x - 1]) {
 
-                        if (x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.orange) { joIrany[0] = 1; joIrany[1] = 3; }
-                        else if (y + 1 <= 10 && fields[y + 1][x].getBackground() == Color.orange) { joIrany[0] = 0; joIrany[1] = 2; }
-                        else if (x + 1 <= 10 && fields[y][x + 1].getBackground() == Color.orange) { joIrany[0] = 1; joIrany[1] = 3; }
-                        else if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.orange) { joIrany[0] = 0; joIrany[1] = 2; }
+                        if (x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.orange) {
+                            joIrany[0] = 1;
+                            joIrany[1] = 3;
+                        } else if (y + 1 <= 10 && fields[y + 1][x].getBackground() == Color.orange) {
+                            joIrany[0] = 0;
+                            joIrany[1] = 2;
+                        } else if (x + 1 <= 10 && fields[y][x + 1].getBackground() == Color.orange) {
+                            joIrany[0] = 1;
+                            joIrany[1] = 3;
+                        } else if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.orange) {
+                            joIrany[0] = 0;
+                            joIrany[1] = 2;
+                        }
 
+                    } else if (!enemyMap[y - 1][x - 1]) {
+                        joIrany[0] = 0;
+                        joIrany[1] = 0;
                     }
-                    else if (!enemyMap[y - 1][x - 1]) { joIrany[0] = 0; joIrany[1] = 0; }
 
+                } else if (!enemyMap[y - 1][x - 1]) {
+                    joIrany[0] = 0;
+                    joIrany[1] = 0;
                 }
-                else if (!enemyMap[y - 1][x - 1]) { joIrany[0] = 0; joIrany[1] = 0; }
 
 
                 if (!talalat || ((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() == Color.BLUE))
@@ -1148,29 +1258,44 @@ public class GameForm extends JFrame {
             if (talalat && !enemyMap[y - 1][x - 1]) talalat = false;
             else if (talalat || enemyMap[y - 1][x - 1]) {
 
-                if (newX != 0) { joIrany[0] = 1; joIrany[1] = 3; }  // Vízszintes irányú "dupla találat" történt => Innentől csak balra és jobbra irányban próbálkozhat tovább stb!!!
-                else if (newY != 0) { joIrany[0] = 0; joIrany[1] = 2; }  // Függőleges irányú "dupla találat" történt!
+                if (newX != 0) {
+                    joIrany[0] = 1;
+                    joIrany[1] = 3;
+                }  // Vízszintes irányú "dupla találat" történt => Innentől csak balra és jobbra irányban próbálkozhat tovább stb!!!
+                else if (newY != 0) {
+                    joIrany[0] = 0;
+                    joIrany[1] = 2;
+                }  // Függőleges irányú "dupla találat" történt!
                 else if (enemyMap[y - 1][x - 1]) {
 
-                    if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.orange) { joIrany[0] = 0; joIrany[1] = 2; }
-                    else if (x + 1 <= 10 && fields[y][x + 1].getBackground() == Color.orange) { joIrany[0] = 1; joIrany[1] = 3; }
-                    else if (y + 1 <= 10 && fields[y + 1][x].getBackground() == Color.orange) { joIrany[0] = 0; joIrany[1] = 2; }
-                    else if (x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.orange) { joIrany[0] = 1; joIrany[1] = 3; }
+                    if (y - 1 >= 1 && fields[y - 1][x].getBackground() == Color.orange) {
+                        joIrany[0] = 0;
+                        joIrany[1] = 2;
+                    } else if (x + 1 <= 10 && fields[y][x + 1].getBackground() == Color.orange) {
+                        joIrany[0] = 1;
+                        joIrany[1] = 3;
+                    } else if (y + 1 <= 10 && fields[y + 1][x].getBackground() == Color.orange) {
+                        joIrany[0] = 0;
+                        joIrany[1] = 2;
+                    } else if (x - 1 >= 1 && fields[y][x - 1].getBackground() == Color.orange) {
+                        joIrany[0] = 1;
+                        joIrany[1] = 3;
+                    }
 
                 }
 
             }
 
 
-            if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(3) >= 1) hasANearbyShip_2 = wasANearbyShip(fields, x, y, 2);
-            else if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(5) <= 1) hasANearbyShip_3 = wasANearbyShip(fields, x, y, 3);
+            if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(3) >= 1)
+                hasANearbyShip_2 = wasANearbyShip(fields, x, y, 2);
+            else if (joIrany[1] == 0 && fields[y][x].getBackground() == Color.orange && vel.nextInt(5) <= 1)
+                hasANearbyShip_3 = wasANearbyShip(fields, x, y, 3);
 
-            if (joIrany[1] == 0 && (hasANearbyShip_2 != -1 || hasANearbyShip_3 != -1) && enemyShipCount > 0)
-            {
+            if (joIrany[1] == 0 && (hasANearbyShip_2 != -1 || hasANearbyShip_3 != -1) && enemyShipCount > 0) {
 
                 if (hasANearbyShip_2 > -1) iranyTipp = hasANearbyShip_2;
                 else if (hasANearbyShip_3 > -1) iranyTipp = hasANearbyShip_3;
-
 
 
                 if (iranyTipp == 0 && y - 1 > 0 && fields[y - 1][x].getBackground() == Color.BLUE) {
@@ -1179,29 +1304,25 @@ public class GameForm extends JFrame {
                     talalat = true;
                     joIrany[0] = 0;
                     joIrany[1] = 2;
-                }
-                else if (iranyTipp == 1 && x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE)  {
+                } else if (iranyTipp == 1 && x + 1 < 11 && fields[y][x + 1].getBackground() == Color.BLUE) {
 
                     x++;
                     talalat = true;
                     joIrany[0] = 1;
                     joIrany[1] = 3;
-                }
-                else if (iranyTipp == 2 && y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) {
+                } else if (iranyTipp == 2 && y + 1 < 11 && fields[y + 1][x].getBackground() == Color.BLUE) {
 
                     y++;
                     talalat = true;
                     joIrany[0] = 0;
                     joIrany[1] = 2;
-                }
-                else if (iranyTipp == 3 && x - 1 > 0 && fields[y][x - 1].getBackground() == Color.BLUE) {
+                } else if (iranyTipp == 3 && x - 1 > 0 && fields[y][x - 1].getBackground() == Color.BLUE) {
 
                     x--;
                     talalat = true;
                     joIrany[0] = 1;
                     joIrany[1] = 3;
-                }
-                else talalat = false;
+                } else talalat = false;
 
                 if (talalat) {
 
@@ -1218,18 +1339,31 @@ public class GameForm extends JFrame {
                         e.printStackTrace();
                     }
 
-                    if (talalat && enemyShipCount > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
-                    else if (!talalat) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash1.wav");
+                    if (talalat && enemyShipCount > 1)
+                        playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash.wav");
+                    else if (!talalat)
+                        playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/splash1.wav");
 
-                    if (talalat) { fields[y][x].setBackground(Color.orange); }
-                    else { fields[y][x].setBackground(Color.cyan); talalat = false; joIrany[0] = 0; joIrany[1] = 0; }
+                    if (talalat) {
+                        fields[y][x].setBackground(Color.orange);
+
+                    } else {
+                        fields[y][x].setBackground(Color.cyan);
+                        talalat = false;
+                        joIrany[0] = 0;
+                        joIrany[1] = 0;
+                    }
+
+                    enemyShipFieldsList = searchClickedShips(enemyFieldsList);
+
 
                     if (talalat && fullShipSize(fields, x, y, false) < 0) fullShipSize(fields, x, y, true);
 
                     if (talalat) enemyShipCount--;
 
                     if (enemyShipCount <= 0) {
-                        if (shipCounter > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
+                        if (shipCounter > 1)
+                            playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/boomm.mp3");
                         popUp("SAJNOS EZT A JÁTSZMÁT MOST ELVESZTETTED!!!", true);
 
                     } else if (talalat) popUp("Hátralévő ellenséges találat: " + enemyShipCount, false);
@@ -1239,7 +1373,10 @@ public class GameForm extends JFrame {
             }
 
 
-            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && !enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 1))) { talalat = true; enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1)); }
+            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && !enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 1))) {
+                talalat = true;
+                enemyHits.add(Integer.toString(y - 1) + Integer.toString(x - 1));
+            }
 
             if (enemyHitsX > 0 && joIrany[1] == 0 && (exexColor == Color.orange || (enemyMap[y - 1][x - 1] && fields[y][x].getBackground() == Color.orange))) {
 
@@ -1266,29 +1403,53 @@ public class GameForm extends JFrame {
                                 diffX = 0;
                                 diffY = 0;
 
-                                switch (vel.nextInt(4)){
+                                switch (vel.nextInt(4)) {
 
-                                    case 0: diffY--; break;
-                                    case 1: diffX++; break;
-                                    case 2: diffY++; break;
-                                    case 3: diffX--; break;
-                                    default:  break;
+                                    case 0:
+                                        diffY--;
+                                        break;
+                                    case 1:
+                                        diffX++;
+                                        break;
+                                    case 2:
+                                        diffY++;
+                                        break;
+                                    case 3:
+                                        diffX--;
+                                        break;
+                                    default:
+                                        break;
 
                                 }
 
                             }
 
-                            if (diffX != 0) { joIrany[0] = 1; joIrany[1] = 3; }
-                            else if (diffY != 0) { joIrany[0] = 0; joIrany[1] = 2; }
+                            if (diffX != 0) {
+                                joIrany[0] = 1;
+                                joIrany[1] = 3;
+                            } else if (diffY != 0) {
+                                joIrany[0] = 0;
+                                joIrany[1] = 2;
+                            }
 
-                            if (joIrany[1] != 0) { n[3] = diffX; n[4] = diffY; }
+                            if (joIrany[1] != 0) {
+                                n[3] = diffX;
+                                n[4] = diffY;
+                            }
                         }
                     }
 
 
                 });
 
-                if (joIrany[1] != 0 && n[1] != -1) { newX = n[3]; newY = n[4]; exexColor = Color.orange; talalat = true; x = n[1]; y = n[2]; }
+                if (joIrany[1] != 0 && n[1] != -1) {
+                    newX = n[3];
+                    newY = n[4];
+                    exexColor = Color.orange;
+                    talalat = true;
+                    x = n[1];
+                    y = n[2];
+                }
 
                 if (n[0] > 0)
                     System.out.print("1-es találat..");
@@ -1296,20 +1457,46 @@ public class GameForm extends JFrame {
             }
 
 
-            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && exexColor != Color.orange) exexColor = Color.orange;
+            if ((talalat || enemyMap[y - 1][x - 1] || fields[y][x].getBackground() == Color.orange) && exexColor != Color.orange)
+                exexColor = Color.orange;
 
             if (fields[y][x].getBackground() == Color.orange) {
 
-                if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x))) { talalat = true; joIrany[0] = 1; joIrany[1] = 3; }
-                else if (x - 1 > 0 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 2))) { talalat = true; joIrany[0] = 1; joIrany[1] = 3; }
-                else if (y + 1 < 11 && enemyHits.contains(Integer.toString(y) + Integer.toString(x - 1))) { talalat = true; joIrany[0] = 0; joIrany[1] = 2; }
-                else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1))) { talalat = true; joIrany[0] = 0; joIrany[1] = 2; }
-                else  { talalat = false; joIrany[0] = 0; joIrany[1] = 0; }
+                if (x + 1 < 11 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x))) {
+                    talalat = true;
+                    joIrany[0] = 1;
+                    joIrany[1] = 3;
+                } else if (x - 1 > 0 && enemyHits.contains(Integer.toString(y - 1) + Integer.toString(x - 2))) {
+                    talalat = true;
+                    joIrany[0] = 1;
+                    joIrany[1] = 3;
+                } else if (y + 1 < 11 && enemyHits.contains(Integer.toString(y) + Integer.toString(x - 1))) {
+                    talalat = true;
+                    joIrany[0] = 0;
+                    joIrany[1] = 2;
+                } else if (y - 1 > 0 && enemyHits.contains(Integer.toString(y - 2) + Integer.toString(x - 1))) {
+                    talalat = true;
+                    joIrany[0] = 0;
+                    joIrany[1] = 2;
+                } else {
+                    talalat = false;
+                    joIrany[0] = 0;
+                    joIrany[1] = 0;
+                }
 
             }
 
 
-        }while (fields[y][x].getBackground() == Color.orange || (fields[y][x].getBackground() == Color.orange && joIrany[1] != 0) || (talalat && joIrany[1] != 0) || (fields[y][x].getBackground() == Color.orange && exColor == Color.BLUE) || exColor == fields[y][x].getBackground() || exexColor == Color.orange);
+        }while (clickedAndNoShipFields == Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
+                .filter(f -> f.getBackground() == Color.cyan).count() || clickedShipFields < Arrays.stream(fields)
+                .flatMap(r -> Arrays.stream(r)).filter(f -> f.getBackground() == Color.orange).count() ||
+                (fields[y][x].getBackground() == Color.orange && ((x - 1 >= 0 && y - 1 >= 0 && enemyMap[y - 1][x - 1]) ||
+                ((enemyShipFieldsList.size() > 0 && shipCounter <= 5) ||
+                (enemyShipFieldsList.size() >= 3 && enemyShipCount >= 11) ||
+                (enemyShipFieldsList.size() >= 5 && (shipCounter < 10 || enemyShipCount >= 11)) ||
+                enemyShipFieldsList.size() >= 7))));
+
+        //}while (exColor == Color.green || fields[y][x].getBackground() == Color.orange || (exColor == Color.BLUE && joIrany[1] != 0) || (talalat && joIrany[1] != 0) || (talalat && fields[y][x].getBackground() == Color.orange) || exColor == fields[y][x].getBackground() || exexColor == Color.orange);
         //}while (clicks - eClicks > ownHits || talalat || fields[y][x].getBackground() == Color.orange || exColor == fields[y][x].getBackground());
 
 
@@ -1436,6 +1623,7 @@ public class GameForm extends JFrame {
                         } else if (i2 > 1 && j2 > 1) playSound("C:/Users/Okoska/Documents/JAVA_projektek/Torpedo/src/sounds/clap.wav");
 
                         if (!ownMap[i2 - 1][j2 - 1] && exColor == Color.BLUE) {
+
                             intelliPlay(enemyFields);
                             //intelliPlay(enemyFields);
                             //intelliPlay(enemyFields); ...
@@ -1451,8 +1639,13 @@ public class GameForm extends JFrame {
 
         }
 
+        //Kétdimenziós -JButton- tömbből egydimenziós egyszerű listává konvertálás ->
 
-        if (!intelliEnemy && vel.nextInt(2) == 1) intelliPlay(enemyFields);  //50-50% hogy mi kezdhetünk vagy az ellenség
+        if (!intelliEnemy)
+            enemyFieldsList = Arrays.stream(this.enemyFields).flatMap(r -> Arrays.stream(r)).filter(f -> f.getBackground() == Color.BLUE).collect(Collectors.toList());
+
+        if (!intelliEnemy && vel.nextInt(2) == 1)
+            intelliPlay(this.enemyFields);  //50-50% hogy mi kezdhetünk vagy az ellenség
 
     }
 
@@ -1492,7 +1685,7 @@ public class GameForm extends JFrame {
 
             for (int X = 1; X <= 10 && newMaxFreeWays < maxFreeWays; X++){
 
-                if (fields[Y][X].getBackground() == Color.BLUE) {
+                if (fields[Y][X].getBackground() == Color.BLUE && !neighborIsAShip(fields, X, Y)) {
 
                     szabadIrany = 0;
                     if (Y - 1 >= 1 && fields[Y - 1][X].getBackground() == Color.BLUE) szabadIrany++;
@@ -1507,10 +1700,126 @@ public class GameForm extends JFrame {
 
                 }
             }
+
         }
 
         return newMaxFreeWays;
     }
 
+    private List<Integer> searchClickedShips(List<JButton> enemyFieldsList){
+
+        //return  Arrays.asList((JButton) Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
+        //        .filter(f -> f.getBackground() == Color.BLUE));
+
+        List<Integer> nextEnemyHitsList = new ArrayList<Integer>();
+
+        enemyFieldsList.stream().forEach(f -> {
+
+            if (f.getBackground() == Color.orange){
+
+                int ind = enemyFieldsList.indexOf(f);
+                int x = ind % 10;
+                int y = ind / 10;
+
+                if (fullShipSize(enemyFields, x, y, false) > 0) {
+
+
+
+                    int topB = y - 1 >= 0 ? ((y - 1) * 10) + x : -1;
+                    int rightB = x + 1 < 10 ? (y * 10) + (x + 1) : -1;
+                    int bottB = y + 1 < 10 ? ((y + 1) * 10) + x : -1;
+                    int leftB = x - 1 >= 0 ? (y * 10) + (x - 1) : -1;
+
+                    int topB2 = y - 2 >= 0 ? ((y - 2) * 10) + x : -1;
+                    int rightB2 = x + 2 < 10 ? (y * 10) + (x + 2) : -1;
+                    int bottB2 = y + 2 < 10 ? ((y + 2) * 10) + x : -1;
+                    int leftB2 = x - 2 >= 0 ? (y * 10) + (x - 2) : -1;
+                    int topB3 = y - 3 >= 0 ? ((y - 3) * 10) + x : -1;
+                    int rightB3 = x + 3 < 10 ? (y * 10) + (x + 3) : -1;
+                    int bottB3 = y + 3 < 10 ? ((y + 3) * 10) + x : -1;
+                    int leftB3 = x - 3 >= 0 ? (y * 10) + (x - 3) : -1;
+
+                    JButton top = new JButton(),
+                            right = new JButton(),
+                            bott = new JButton(),
+                            left = new JButton(),
+                            top2 = new JButton(),
+                            right2 = new JButton(),
+                            bott2 = new JButton(),
+                            left2 = new JButton(),
+                            top3 = new JButton(),
+                            right3 = new JButton(),
+                            bott3 = new JButton(),
+                            left3 = new JButton();
+
+
+                    if (topB != -1) top = enemyFieldsList.get(topB);
+                    if (rightB != -1) right = enemyFieldsList.get(rightB);
+                    if (bottB != -1) bott = enemyFieldsList.get(bottB);
+                    if (leftB != -1) left = enemyFieldsList.get(leftB);
+                    if (topB2 != -1) top2 = enemyFieldsList.get(topB);
+                    if (rightB2 != -1) right2 = enemyFieldsList.get(rightB);
+                    if (bottB2 != -1) bott2 = enemyFieldsList.get(bottB);
+                    if (leftB2 != -1) left2 = enemyFieldsList.get(leftB);
+
+
+                    if (topB != -1 && bottB != -1 && top.getBackground() == Color.orange && bott.getBackground() == Color.BLUE) nextEnemyHitsList.add(bottB);
+                    if (topB != -1 && bottB != -1 && top.getBackground() == Color.BLUE && bott.getBackground() == Color.orange) nextEnemyHitsList.add(topB);
+
+                    if (rightB != -1 && leftB != -1 && right.getBackground() == Color.orange && left.getBackground() == Color.BLUE) nextEnemyHitsList.add(leftB);
+                    if (rightB != -1 && leftB != -1 && right.getBackground() == Color.BLUE && left.getBackground() == Color.orange) nextEnemyHitsList.add(rightB);
+
+                    int szabadIrany = 0;
+                    if (topB != -1 && top.getBackground() == Color.BLUE) szabadIrany++;
+                    if (rightB != -1 && right.getBackground() == Color.BLUE) szabadIrany++;
+                    if (bottB != -1 && bott.getBackground() == Color.BLUE) szabadIrany++;
+                    if (leftB != -1 && left.getBackground() == Color.BLUE) szabadIrany++;
+
+                    if (szabadIrany == 1) {
+
+                        if (topB != -1 && top.getBackground() == Color.BLUE && ((rightB != -1 && right.getBackground() != Color.orange) || (leftB != -1 && left.getBackground() != Color.orange))) nextEnemyHitsList.add(topB);
+                        else if (rightB != -1 && right.getBackground() == Color.BLUE && ((topB != -1 && top.getBackground() != Color.orange) || (bottB != -1 && bott.getBackground() != Color.orange))) nextEnemyHitsList.add(rightB);
+                        else if (bottB != -1 && bott.getBackground() == Color.BLUE && ((rightB != -1 && right.getBackground() != Color.orange) || (leftB != -1 && left.getBackground() != Color.orange))) nextEnemyHitsList.add(bottB);
+                        else if (leftB != -1 && left.getBackground() == Color.BLUE && ((topB != -1 && top.getBackground() != Color.orange) || (bottB != -1 && bott.getBackground() != Color.orange))) nextEnemyHitsList.add(leftB);
+                    }
+                    else if (szabadIrany == 2) {
+
+                        if (topB != -1 && top.getBackground() == Color.BLUE && topB2 != -1 && top2.getBackground() == Color.orange && topB3 != -1 && top3.getBackground() == Color.orange) nextEnemyHitsList.add(topB);
+                        else if (rightB != -1 && right.getBackground() == Color.BLUE && rightB2 != -1 && right2.getBackground() == Color.orange && rightB3 != -1 && right3.getBackground() == Color.orange) nextEnemyHitsList.add(rightB);
+                        else if (bottB != -1 && bott.getBackground() == Color.BLUE && bottB2 != -1 && bott2.getBackground() == Color.orange && bottB3 != -1 && bott3.getBackground() == Color.orange) nextEnemyHitsList.add(bottB);
+                        else if (leftB != -1 && left.getBackground() == Color.BLUE && leftB2 != -1 && left2.getBackground() == Color.orange && leftB3 != -1 && left3.getBackground() == Color.orange) nextEnemyHitsList.add(leftB);
+
+                        if ((topB == -1 || (topB != -1 && top.getBackground() == Color.cyan)) && (bottB == -1 || (bottB != -1 && bott.getBackground() == Color.cyan))){
+
+                            if (rightB != -1) nextEnemyHitsList.add(rightB);
+                            if (leftB != -1) nextEnemyHitsList.add(leftB);
+                        }
+                        else if ((rightB == -1 || (rightB != -1 && right.getBackground() == Color.cyan)) && (leftB == -1 || (leftB != -1 && left.getBackground() == Color.cyan))){
+
+                            if (topB != -1) nextEnemyHitsList.add(topB);
+                            if (bottB != -1) nextEnemyHitsList.add(bottB);
+                        }
+                    }
+
+                    /*if (topB != -1 && bottB != -1 && top.getBackground() == Color.cyan && bott.getBackground() == Color.cyan){
+
+                        if (rightB != -1 && right.getBackground() == Color.BLUE) nextEnemyHitsList.add(rightB);
+                        if (leftB != -1 && left.getBackground() == Color.BLUE) nextEnemyHitsList.add(leftB);
+                    }
+
+                    if (rightB != -1 && leftB != -1 && right.getBackground() == Color.cyan && left.getBackground() == Color.cyan) nextEnemyHitsList.add(leftB){
+
+                        if (topB != -1 && top.getBackground() == Color.BLUE) nextEnemyHitsList.add(topB);
+                        if (bottB != -1 && bott.getBackground() == Color.BLUE) nextEnemyHitsList.add(bottB);
+                    }*/
+
+                }
+                else fullShipSize(enemyFields, x, y, true);
+            }
+
+        });
+
+        return nextEnemyHitsList;
+    }
 
 }
