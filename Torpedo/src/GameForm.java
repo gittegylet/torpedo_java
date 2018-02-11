@@ -41,6 +41,10 @@ public class GameForm extends JFrame {
 
     List<Integer> enemyShipFieldsList;
 
+    long ownBadClicks,
+         enemyBadClicks;
+
+    boolean enemyBadClicks0;
 
     static Random vel = new Random();
 
@@ -51,6 +55,8 @@ public class GameForm extends JFrame {
     JButton[][] enemyFields;
 
     private int maxFreeWays = 4;
+
+    int maxFreeFields = 18;
 
 
     public static synchronized void playSound(final String path) {
@@ -88,6 +94,10 @@ public class GameForm extends JFrame {
             enemyFieldsList = new ArrayList<JButton>();
 
             enemyShipFieldsList = new ArrayList<Integer>();
+
+            this.ownBadClicks = 0;
+            this.enemyBadClicks = 0;
+            this.enemyBadClicks0 = false;
 
             reGame = true;
             for (int i = 0; i < 10; i++){
@@ -427,9 +437,9 @@ public class GameForm extends JFrame {
                 //.filter(f -> f.getBackground() == Color.BLUE || f.getBackground() == Color.orange)
                 .count();
 
-
-
         long clickedShipFields = 100;
+
+        int freeFields = 0;
 
         do {
 
@@ -535,7 +545,9 @@ public class GameForm extends JFrame {
             if ((enemyShipFieldsList.size() > 0 && shipCounter <= 5) ||
                 (enemyShipFieldsList.size() >= 3 && enemyShipCount >= 11) ||
                 (enemyShipFieldsList.size() >= 5 && (shipCounter < 10 || enemyShipCount >= 11)) ||
-                enemyShipFieldsList.size() >= 7) {
+                enemyShipFieldsList.size() >= 7 ||
+                (enemyShipFieldsList.size() > 1 && vel.nextInt(3) == 2) ||
+                (enemyShipFieldsList.size() > 0 && (shipCounter < 4 || enemyShipCount < 3) && vel.nextInt(2) == 1)) {
 
                 int rand = enemyShipFieldsList.size() > 1 ? vel.nextInt(enemyShipFieldsList.size()) : 0;
 
@@ -782,6 +794,10 @@ public class GameForm extends JFrame {
                                         x = vel.nextInt(10) + 1;
                                         y = vel.nextInt(10) + 1;
 
+                                        maxFreeFields = freeFieldsCount(enemyFieldsList);
+                                        freeFields = clickedShipsOnColumn(enemyFieldsList, x) + clickedShipsOnRow(enemyFieldsList, y);
+
+
                                         szabadIrany = 0;
 
                                         if (fields[y][x].getBackground() == Color.orange)
@@ -792,7 +808,7 @@ public class GameForm extends JFrame {
                                         else if (neighborISAFULLShip) neighborISAFULLShip = false;
 
                                     }
-                                    while (neighborISAFULLShip || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
+                                    while (neighborISAFULLShip || (vel.nextInt(4) <= 1 && freeFields < maxFreeFields - 3) || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
 
                                 }
 
@@ -877,6 +893,9 @@ public class GameForm extends JFrame {
 
                             wasShip = neighborIsAShip(fields, x, y);
 
+                            maxFreeFields = freeFieldsCount(enemyFieldsList);
+                            freeFields = clickedShipsOnColumn(enemyFieldsList, x) + clickedShipsOnRow(enemyFieldsList, y);
+
                             /*exHit = false;
                             if (wasShip && enemyHitsX > 0) {
 
@@ -913,7 +932,7 @@ public class GameForm extends JFrame {
                             else if (neighborISAFULLShip) neighborISAFULLShip = false;
 
                         }
-                        while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))));
+                        while ((wasShip && !follower) || neighborISAFULLShip || (vel.nextInt(4) < 3 && freeFields < maxFreeFields - 3) || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))));
                         ////} while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 && nextExShip))));
                         //} while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (nextExShip && (!wasShip || (wasShip && !exHit)))))));
 
@@ -952,6 +971,9 @@ public class GameForm extends JFrame {
                     y = vel.nextInt(10) + 1;
 
                     wasShip = neighborIsAShip(fields, x, y);
+
+                    maxFreeFields = freeFieldsCount(enemyFieldsList);
+                    freeFields = clickedShipsOnColumn(enemyFieldsList, x) + clickedShipsOnRow(enemyFieldsList, y);
 
                     /*exHit = false;
                     if (wasShip && enemyHitsX > 0) {
@@ -995,7 +1017,7 @@ public class GameForm extends JFrame {
 
 
                 }
-                while ((wasShip && !follower) || neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))));
+                while ((wasShip && !follower) || neighborISAFULLShip || (vel.nextInt(4) < 3 && freeFields < maxFreeFields - 3) || (!follower && ((freeWays < maxFreeWays || (!nextExShip && fields[y][x].getBackground() != Color.BLUE)) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip)))));
                 //} while (neighborISAFULLShip || (!follower && ((freeWays < maxFreeWays || (!nextExShip && (fields[y][x].getBackground() != Color.BLUE) || (wasShip && !exHit))) || (freeWays < maxFreeWays - 1 || (fields[y][x].getBackground() != Color.BLUE && nextExShip && (!wasShip || (wasShip && !exHit)))))));
 
 
@@ -1035,6 +1057,10 @@ public class GameForm extends JFrame {
                                 szabadIrany = 0;
                                 x = vel.nextInt(10) + 1;
                                 y = vel.nextInt(10) + 1;
+
+                                maxFreeFields = freeFieldsCount(enemyFieldsList);
+                                freeFields = clickedShipsOnColumn(enemyFieldsList, x) + clickedShipsOnRow(enemyFieldsList, y);
+                                
                                 if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
 
                                 if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y))
@@ -1042,7 +1068,8 @@ public class GameForm extends JFrame {
                                 else if (neighborISAFULLShip) neighborISAFULLShip = false;
 
                             }
-                            while (neighborISAFULLShip || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
+                            while (neighborISAFULLShip || (vel.nextInt(4) <= 1 && freeFields < maxFreeFields - 3) || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
+                            //while (neighborISAFULLShip || (vel.nextInt(4) <= 1 && freeFields < maxFreeFields - 3) || (fields[y][x].getBackground() != Color.orange || (fields[y][x].getBackground() == Color.orange && (fullShipSize(fields, x, y, false) < 0 || szabadIrany < 1))));
 
                         }
                     }
@@ -1486,15 +1513,24 @@ public class GameForm extends JFrame {
 
             }
 
+            ownBadClicks = Arrays.stream(this.fields).flatMap(r -> Arrays.stream(r))
+                    .filter(f -> f.getBackground() == Color.cyan).count();
 
-        }while (clickedAndNoShipFields == Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
-                .filter(f -> f.getBackground() == Color.cyan).count() || clickedShipFields < Arrays.stream(fields)
-                .flatMap(r -> Arrays.stream(r)).filter(f -> f.getBackground() == Color.orange).count() ||
+            enemyBadClicks = Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
+                    .filter(f -> f.getBackground() == Color.cyan).count();
+
+
+        }while ((!enemyBadClicks0 && enemyBadClicks < ownBadClicks) || (enemyBadClicks0 && enemyBadClicks <= ownBadClicks) ||
+                (((!enemyBadClicks0 && enemyBadClicks < ownBadClicks) || (enemyBadClicks0 && enemyBadClicks <= ownBadClicks)) &&
+                (clickedAndNoShipFields == Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
+                .filter(f -> f.getBackground() == Color.cyan).count() || (clickedShipFields <= Arrays.stream(fields)
+                .flatMap(r -> Arrays.stream(r)).filter(f -> f.getBackground() == Color.orange).count() &&
+                (fields[y][x].getBackground() == Color.orange || (x - 1 >= 0 && y - 1 >= 0 && enemyMap[y - 1][x - 1]))) ||
                 (fields[y][x].getBackground() == Color.orange && ((x - 1 >= 0 && y - 1 >= 0 && enemyMap[y - 1][x - 1]) ||
                 ((enemyShipFieldsList.size() > 0 && shipCounter <= 5) ||
                 (enemyShipFieldsList.size() >= 3 && enemyShipCount >= 11) ||
                 (enemyShipFieldsList.size() >= 5 && (shipCounter < 10 || enemyShipCount >= 11)) ||
-                enemyShipFieldsList.size() >= 7))));
+                enemyShipFieldsList.size() >= 7))))));
 
         //}while (exColor == Color.green || fields[y][x].getBackground() == Color.orange || (exColor == Color.BLUE && joIrany[1] != 0) || (talalat && joIrany[1] != 0) || (talalat && fields[y][x].getBackground() == Color.orange) || exColor == fields[y][x].getBackground() || exexColor == Color.orange);
         //}while (clicks - eClicks > ownHits || talalat || fields[y][x].getBackground() == Color.orange || exColor == fields[y][x].getBackground());
@@ -1644,9 +1680,13 @@ public class GameForm extends JFrame {
         if (!intelliEnemy)
             enemyFieldsList = Arrays.stream(this.enemyFields).flatMap(r -> Arrays.stream(r)).filter(f -> f.getBackground() == Color.BLUE).collect(Collectors.toList());
 
-        if (!intelliEnemy && vel.nextInt(2) == 1)
+        if (!intelliEnemy && vel.nextInt(2) == 1) {
+
             intelliPlay(this.enemyFields);  //50-50% hogy mi kezdhetünk vagy az ellenség
 
+            enemyBadClicks0 = Arrays.stream(fields).flatMap(r -> Arrays.stream(r))
+                    .filter(f -> f.getBackground() == Color.cyan).count() >= 1;
+        }
     }
 
 
@@ -1682,16 +1722,15 @@ public class GameForm extends JFrame {
         int newMaxFreeWays = 1;
 
         for (int Y = 1; Y <= 10 && newMaxFreeWays < maxFreeWays; Y++){
-
             for (int X = 1; X <= 10 && newMaxFreeWays < maxFreeWays; X++){
 
                 if (fields[Y][X].getBackground() == Color.BLUE && !neighborIsAShip(fields, X, Y)) {
 
-                    szabadIrany = 0;
-                    if (Y - 1 >= 1 && fields[Y - 1][X].getBackground() == Color.BLUE) szabadIrany++;
-                    if (Y + 1 < 11 && fields[Y + 1][X].getBackground() == Color.BLUE) szabadIrany++;
-                    if (X - 1 >= 1 && fields[Y][X - 1].getBackground() == Color.BLUE) szabadIrany++;
-                    if (X + 1 < 11 && fields[Y][X + 1].getBackground() == Color.BLUE) szabadIrany++;
+                    szabadIrany = freeWay(fields, X, Y);
+                    //if (Y - 1 >= 1 && fields[Y - 1][X].getBackground() == Color.BLUE) szabadIrany++;
+                    //if (Y + 1 < 11 && fields[Y + 1][X].getBackground() == Color.BLUE) szabadIrany++;
+                    //if (X - 1 >= 1 && fields[Y][X - 1].getBackground() == Color.BLUE) szabadIrany++;
+                    //if (X + 1 < 11 && fields[Y][X + 1].getBackground() == Color.BLUE) szabadIrany++;
 
                     if (szabadIrany > newMaxFreeWays) {
                         newMaxFreeWays = szabadIrany;
@@ -1700,7 +1739,6 @@ public class GameForm extends JFrame {
 
                 }
             }
-
         }
 
         return newMaxFreeWays;
@@ -1821,5 +1859,40 @@ public class GameForm extends JFrame {
 
         return nextEnemyHitsList;
     }
+
+
+    int clickedShipsOnColumn(List<JButton> fieldsList, int columnX){
+
+        return (int)fieldsList.stream().filter(f -> fieldsList.indexOf(f) % 10 == columnX && f.getBackground() == Color.orange).count();
+    }
+
+    int clickedShipsOnRow(List<JButton> fieldsList, int rowY){
+
+        return (int)fieldsList.stream().filter(f -> fieldsList.indexOf(f) / 10 == rowY && f.getBackground() == Color.orange).count();
+    }
+
+    private int freeFieldsCount(List<JButton> fieldsList){
+
+        int szabadCella = 0;
+        int newMaxFreeFields = 1;
+
+        for (int Y = 1; Y <= 10 && newMaxFreeFields < maxFreeFields; Y++){
+
+            for (int X = 1; X <= 10 && newMaxFreeFields < maxFreeFields; X++){
+
+                if (this.enemyFields[Y][X].getBackground() == Color.BLUE && !neighborIsAShip(this.enemyFields, X, Y)) {
+
+                    szabadCella = 0;
+                    szabadCella += clickedShipsOnColumn(fieldsList,X - 1) + clickedShipsOnRow(fieldsList,Y - 1);
+
+                    if (szabadCella > newMaxFreeFields) newMaxFreeFields = szabadCella;
+
+                }
+            }
+        }
+
+        return newMaxFreeFields;
+    }
+
 
 }
