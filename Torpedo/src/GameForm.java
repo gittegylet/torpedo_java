@@ -60,6 +60,8 @@ public class GameForm extends JFrame {
 
 
     public static synchronized void playSound(final String path) {
+        //return;
+
         new Thread(new Runnable() {
 
             public void run() {
@@ -132,9 +134,27 @@ public class GameForm extends JFrame {
 
     }
 
-    private void popUp(String message, boolean gameOver){
-        if (!gameOver) JOptionPane.showMessageDialog(null, message);
-        else JOptionPane.showMessageDialog(null, message, "GAME OVER", 0);
+    private boolean popUp(String message, boolean gameOver){
+        if (!gameOver) { JOptionPane.showMessageDialog(null, message); return false; }
+        else {
+
+            //JOptionPane.showMessageDialog(null, message, "GAME OVER", 0);
+
+            int reply = JOptionPane.showConfirmDialog (null, message, "GAME OVER", JOptionPane.YES_NO_OPTION);
+            if (reply == JOptionPane.YES_OPTION) {
+                JOptionPane.showMessageDialog(null, "Indul a következő játék...");
+                return true;
+            }
+            else {
+                //JOptionPane.showMessageDialog(null, "GOODBYE");
+                return false;
+                System.exit(0);
+            }
+
+        }
+
+
+
     }
 
 
@@ -860,7 +880,7 @@ public class GameForm extends JFrame {
 
                     }
 
-                    if ((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() == Color.orange)
+                    if ((newX != 0 || newY != 0) && y + newY > 0 && y + newY < 11 && x + newX > 0 && x + newX < 11 && fields[y + newY][x + newX].getBackground() == Color.orange)
                         fullSize = fullShipSize(fields, x, y, false);
 
 
@@ -1060,7 +1080,7 @@ public class GameForm extends JFrame {
 
                                 maxFreeFields = freeFieldsCount(enemyFieldsList);
                                 freeFields = clickedShipsOnColumn(enemyFieldsList, x) + clickedShipsOnRow(enemyFieldsList, y);
-                                
+
                                 if (fields[y][x].getBackground() == Color.orange) szabadIrany = freeWay(fields, x, y);
 
                                 if (neighborIsAShip(fields, x, y) && !neighborIsNOTAFULLShip(fields, x, y))
@@ -1118,7 +1138,7 @@ public class GameForm extends JFrame {
                         (fields[y][x].getBackground() != Color.orange && joIrany[1] == 0 && neighborIsAShip(fields, x + newX, y + newY) && iranyProbak.size() < szabadIrany) ||
                         (fields[y][x].getBackground() == Color.orange && joIrany[1] != 0 && !Arrays.asList(joIrany).contains(rand) && iranyProbak.size() < szabadIrany)));
 
-                if ((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() == Color.BLUE) {
+                if ((newX != 0 || newY != 0) && y + newY > 0 && y + newY < 11 && x + newX > 0 && x + newX < 11 && fields[y + newY][x + newX].getBackground() == Color.BLUE) {
 
                     x += newX;
                     y += newY;
@@ -1276,7 +1296,7 @@ public class GameForm extends JFrame {
                 }
 
 
-                if (!talalat || ((newX != 0 || newY != 0) && fields[y + newY][x + newX].getBackground() == Color.BLUE))
+                if (!talalat || ((newX != 0 || newY != 0) && y + newY > 0 && y + newY < 11 && x + newX > 0 && x + newX < 11 && fields[y + newY][x + newX].getBackground() == Color.BLUE))
                     talalat = enemyMap[y - 1][x - 1];
 
             }
